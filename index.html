@@ -4,10 +4,15 @@
   <meta charset="UTF-8">
   <title> Formulario Plano de Ação </title>
 </head>
-<body>
+<body bgcolor="#f4f4f4" style="font-family: Arial, sans-serif; padding: 20px;">
+    <table width="500" align="center" bgcolor="#ffffff" cellpadding="30" cellspacing="0" border="0" style="border-top: 5px solid #181D3E; border-radius: 8px;">
+    <tr>
+      <td>
+        <h2 align="center" style="color: #181D3E; margin-top: 0;">Plano de Ação</h2>
+        <hr color="#BE1F25" size="2">
 <form id="formPlano">
     <label> Area responsavel* </label><br>
-    <select name="area" required>
+    <select name="area" required style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
         <option value=""> Selecione a area </option>
         <option>Coleta</option>
         <option>HUB e MH</option>
@@ -19,15 +24,13 @@
     
     <br><br>
     <label>Problema Identificado*</label><br>
-    <textarea name="problema" rows="4" cols="40" maxlenth="500" placeholder="Descreva o Problema operacional..." required></textarea>
-    <br><br>
+            <textarea name="problema" rows="3" maxlength="500" placeholder="Descreva o problema operacional..." required style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
     
     <label>Causa Raiz*</label><br>
-    <textarea name="causa" rows="4" cols="40" maxlength="500" placeholder="Qual é a Causa Identificada?" required></textarea>
-    <br><br>
+    <textarea name="causa" rows="3" maxlength="500" placeholder="Qual é a causa identificada?" required style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
     
     <label>Plano de ação*</label><br>
-    <textarea name="plano" rows="4" cols="40" maxlength="500" placeholder="O que Será Feito Para Resolver o Problema?" required></textarea>
+    <textarea name="plano" rows="3" maxlength="500" placeholder="O que será feito para resolver o problema?" required style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
     <br><br>
     
     <label>Responsavel*</label><br>
@@ -35,11 +38,11 @@
     <br><br>
     
     <label>Prazo Previsto</label><br>
-    <input type="date" name="prazo" required>
+    <input type="date" name="prazo" required style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
     <br><br>
     
     <label>Status</label>
-    <select name="status">
+    <select name="status" style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
         <option>Aberto</option>
         <option>Em Andamento</option>
         <option>Concluido</option>
@@ -52,8 +55,9 @@
     <br><br>
     
     <label>Comentario de Acompanhamento</label> <br><br>
-    <input type="text" name="comentario" maxlength="500" placeholder="Atualização Mais Recente">
-    <button type="submit"> Salvar Plano de Ação</button>
+    <input type="text" name="comentario" maxlength="500" placeholder="Atualização mais recente" style="width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+    
+    <button type="submit" style="background-color: #BE1F25; color: #ffffff; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;">
 
   <script>
   document.getElementById('formPlano').addEventListener('submit', async function(e) {
