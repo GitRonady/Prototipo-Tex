@@ -2,10 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-    <title> Formulario Plano de Ação </title>
+  <title> Formulario Plano de Ação </title>
 </head>
-
-<body>
+<body bg color=>
 <form id="formPlano">
     <label> Area responsavel* </label><br>
     <select name="area" required>
@@ -20,19 +19,19 @@
     
     <br><br>
     <label>Problema Identificado*</label><br>
-    <textarea name="problema" rows="4" cols="40" placeholder="Descreva o Problema operacional..." required></textarea>
+    <textarea name="problema" rows="4" cols="40" maxlenth="500" placeholder="Descreva o Problema operacional..." required></textarea>
     <br><br>
     
     <label>Causa Raiz*</label><br>
-    <textarea name="causa" rows="4" cols="40" placeholder="Qual é a Causa Identificada?" required></textarea>
+    <textarea name="causa" rows="4" cols="40" maxlength="500" placeholder="Qual é a Causa Identificada?" required></textarea>
     <br><br>
     
     <label>Plano de ação*</label><br>
-    <textarea name="plano" rows="4" cols="40" placeholder="O que Será Feito Para Resolver o Problema?" required></textarea>
+    <textarea name="plano" rows="4" cols="40" maxlength="500" placeholder="O que Será Feito Para Resolver o Problema?" required></textarea>
     <br><br>
     
     <label>Responsavel*</label><br>
-    <input type="text" name="responsavel" placeholder="Nome do responsavel" required>
+    <input type="text" name="responsavel" maxlength="500" placeholder="Nome do responsavel" required>
     <br><br>
     
     <label>Prazo Previsto</label><br>
@@ -53,7 +52,7 @@
     <br><br>
     
     <label>Comentario de Acompanhamento</label> <br><br>
-    <input type="text" name="comentario" placeholder="Atualização Mais Recente">
+    <input type="text" name="comentario" maxlength="500" placeholder="Atualização Mais Recente">
     <button type="submit"> Salvar Plano de Ação</button>
 
   <script>
