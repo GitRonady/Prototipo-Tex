@@ -55,6 +55,38 @@
     <label>Comentario de Acompanhamento</label> <br><br>
     <input type="text" name="comentario" placeholder="Atualização Mais Recente">
     <button type="submit"> Salvar Plano de Ação</button>
+
+  <script>
+  document.getElementById('formPlano').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const dados = Object.fromEntries(formData.entries());
+
+    
+    const urlPowerAutomate = 'COLE_AQUI_A_URL_GERADA_NO_POWER_AUTOMATE';
+
+    try {
+      const resposta = await fetch(urlPowerAutomate, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dados)
+      });
+
+      if (resposta.ok) {
+        alert('Plano de ação salvo com sucesso no SharePoint!');
+        this.reset();
+      } else {
+        alert('Erro ao salvar. Verifique o console para mais detalhes.');
+        console.error(await resposta.text());
+      }
+    } catch (erro) {
+      console.error('Erro na requisição:', erro);
+      alert('Não foi possível conectar. Tente novamente.');
+    }
+  });
+</script>
 </form>
 </body>
 </html>
