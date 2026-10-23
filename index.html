@@ -211,8 +211,8 @@
   </div>
 
 <script>
-
-  const URL_FLUXO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
+  const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
+  const URL_LISTAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/3fbf1a2a119441dabcb8c284dcae4cfe/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OdpmDoJPfT2zixNtGYBbnkZJkWrhs2pyVKgk1oPtOUI';  
 
   const form = document.getElementById('formPlano');
   const ICONE_CALENDARIO = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>';
@@ -221,8 +221,8 @@
   let todosOsItens = []; 
   let filtroAtual = 'todos'; 
 
-  async function chamarFluxo(payload) {
-    const resposta = await fetch(URL_FLUXO, {
+   async function chamarFluxo(payload, url) { 
+    const resposta = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -236,6 +236,7 @@
     return Object.fromEntries(new FormData(form).entries());
   }
 
+ 
   function atualizarContadores() {
     form.querySelectorAll('textarea').forEach(t => {
       t.parentElement.querySelector('.contador').textContent = t.value.length + '/' + t.maxLength;
@@ -243,16 +244,17 @@
   }
   form.addEventListener('input', atualizarContadores);
 
+
   document.querySelectorAll('.filtros button').forEach(btn => {
     btn.addEventListener('click', (e) => {
       document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
       e.target.classList.add('ativo');
-      
       filtroAtual = e.target.dataset.filtro;
       desenharLista();
     });
   });
 
+ 
   function formatarData(valor) {
     if (!valor) return '';
     const d = new Date(valor);
@@ -271,23 +273,28 @@
     const lista = document.getElementById('listaFormularios');
     lista.innerHTML = '<p class="vazio">Carregando...</p>';
     try {
-      const res = await chamarFluxo({ acao: 'listar' });
-      todosOsItens = Array.isArray(res) ? res : (res.itens || []);
+      
+      const res = await chamarFluxo({ acao: 'listar' }, URL_LISTAR); 
+      
+      
+      todosOsItens = res.value || res.itens || res; 
+      
       desenharLista();
     } catch (erro) {
       console.error(erro);
       lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
     }
   }
+
   function desenharLista() {
     const lista = document.getElementById('listaFormularios');
     lista.innerHTML = '';
 
     let itensFiltrados = todosOsItens;
     if (filtroAtual === 'pendente') {
-      itensFiltrados = todosOsItens.filter(item => item.situacao !== 'Finalizado');
+      itensFiltrados = todosOsItens.filter(item => item.Situacao !== 'Finalizado' && item.situacao !== 'Finalizado');
     } else if (filtroAtual === 'finalizado') {
-      itensFiltrados = todosOsItens.filter(item => item.situacao === 'Finalizado');
+      itensFiltrados = todosOsItens.filter(item => item.Situacao === 'Finalizado' || item.situacao === 'Finalizado');
     }
 
     if (itensFiltrados.length === 0) {
@@ -296,23 +303,25 @@
     }
 
     itensFiltrados.forEach(item => {
-      const cartao = criar('div', 'item' + (String(item.id) === String(idEmEdicao) ? ' ativo' : ''));
+      const cartao = criar('div', 'item' + (String(item.id || item.ID) === String(idEmEdicao) ? ' ativo' : ''));
 
       const info = criar('div');
       
-      const isFinalizado = item.situacao === 'Finalizado';
+     
+      const statusItem = item.Situacao || item.situacao || 'Pendente';
+      const isFinalizado = statusItem === 'Finalizado';
       const badge = criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Incompleto');
       
-      const problema = item.problema || 'Sem problema descrito';
+      const problema = item.problema || item.Problema || 'Sem problema descrito';
       
       info.append(
         badge,
         criar('strong', '', problema.length > 45 ? problema.slice(0, 45) + '...' : problema),
-        criar('p', '', 'Área: ' + (item.area || 'não definida')),
-        criar('p', '', 'ID: ' + item.id)
+        criar('p', '', 'Área: ' + (item.area || item.Area || 'não definida')),
+        criar('p', '', 'ID: ' + (item.id || item.ID || 'N/A'))
       );
       
-      const data = formatarData(item.criadoEm);
+      const data = formatarData(item.criadoEm || item.CriadoEm);
       if (data) {
         const linhaData = criar('p', 'data');
         linhaData.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
@@ -329,6 +338,7 @@
     });
   }
 
+
   function mostrarId() {
     document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
   }
@@ -336,12 +346,15 @@
   function abrirFormulario(item) {
     form.reset();
     ['area', 'problema', 'causa', 'plano', 'responsavel', 'status', 'comentario'].forEach(campo => {
+    
       if (item[campo]) form.elements[campo].value = item[campo];
+      else if (item[campo.charAt(0).toUpperCase() + campo.slice(1)]) form.elements[campo].value = item[campo.charAt(0).toUpperCase() + campo.slice(1)];
     });
-    if (item.prazo) form.elements.prazo.value = String(item.prazo).slice(0, 10);
-    if (item.dataConclusao) form.elements.dataConclusao.value = String(item.dataConclusao).slice(0, 10);
+    
+    if (item.prazo || item.Prazo) form.elements.prazo.value = String(item.prazo || item.Prazo).slice(0, 10);
+    if (item.dataConclusao || item.DataConclusao) form.elements.dataConclusao.value = String(item.dataConclusao || item.DataConclusao).slice(0, 10);
 
-    idEmEdicao = item.id;
+    idEmEdicao = item.id || item.ID;
     mostrarId();
     atualizarContadores();
     desenharLista();
@@ -359,6 +372,7 @@
   document.getElementById('btnNovo').addEventListener('click', novoFormulario);
   document.getElementById('btnAtualizar').addEventListener('click', carregarFormularios);
 
+ 
   document.getElementById('btnIncompleto').addEventListener('click', async function () {
     const dados = lerCampos();
     if (!dados.area && !dados.problema) {
@@ -367,10 +381,11 @@
     }
     this.disabled = true;
     try {
-      await chamarFluxo({ ...dados, acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, situacao: 'Pendente' });
+    
+      await chamarFluxo({ ...dados, acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, situacao: 'Pendente' }, URL_SALVAR);
       alert('Formulário salvo como incompleto.');
       novoFormulario();
-      carregarFormularios(); 
+      carregarFormularios();
     } catch (erro) {
       console.error(erro);
       alert('Não foi possível salvar. Tente novamente.');
@@ -378,12 +393,14 @@
     this.disabled = false;
   });
 
+  
   form.addEventListener('submit', async function (e) {
     e.preventDefault(); 
     const botao = document.getElementById('btnConcluir');
     botao.disabled = true;
     try {
-      await chamarFluxo({ ...lerCampos(), acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, situacao: 'Finalizado' });
+      
+      await chamarFluxo({ ...lerCampos(), acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, situacao: 'Finalizado' }, URL_SALVAR);
       alert('Plano de ação salvo com sucesso!');
       novoFormulario();
       carregarFormularios();
@@ -397,5 +414,5 @@
   atualizarContadores();
   carregarFormularios();
 </script>
-</body>  
+</body>
 </html>
