@@ -62,11 +62,11 @@
     .b-vermelho { background: var(--vermelho); color: #fff; }
     .b-atualizar { background: none; color: #fff; padding: 4px 0; font-size: 14px; font-weight: 600; border: none; }
 
-    /* lista */
+    
     .info { background: #e3eefb; color: #1b3a73; border-radius: 6px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; font-size: 15px; margin-bottom: 14px; }
     .info .ic { font-size: 24px; color: var(--destaque); }
     
-    /* Filtros */
+    
     .filtros { display: flex; gap: 8px; margin-bottom: 14px; }
     .filtros button { flex: 1; padding: 8px; font-size: 13px; background: #fff; color: var(--suave); border: 1px solid var(--borda); }
     .filtros button.ativo { background: var(--destaque); color: #fff; border-color: var(--destaque); }
@@ -79,7 +79,7 @@
     .item button { padding: 9px 18px; font-size: 14px; flex: none; }
     .vazio { color: var(--suave); font-size: 14px; margin: 8px 0; }
 
-    /* Badges de Status */
+   
     .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; }
     .badge.pendente { background: #fff3cd; color: var(--laranja); border: 1px solid #ffeeba; }
     .badge.finalizado { background: #d4edda; color: var(--verde); border: 1px solid #c3e6cb; }
@@ -88,7 +88,6 @@
 <body>
   <div class="layout">
 
-    <!-- FORMULÁRIO -->
     <section class="painel">
       <div class="cabecalho"><h1>Plano de Ação</h1></div>
       <div class="corpo">
@@ -183,7 +182,7 @@
       </div>
     </section>
 
-    <!-- PAINEL DA LISTA (DIREITA) -->
+ 
     <section class="painel">
       <div class="cabecalho lista">
         <h2>
@@ -201,7 +200,6 @@
           <span>Selecione um formulário para continuar o preenchimento.</span>
         </div>
 
-        <!-- BOTÕES DE FILTRO -->
         <div class="filtros">
           <button type="button" class="ativo" data-filtro="todos">Todos</button>
           <button type="button" data-filtro="pendente">Incompletos</button>
@@ -215,12 +213,10 @@
   </div>
 
 <script>
-  // =========================================================
-  // ⚠️ COLE AQUI AS DUAS URLs DO POWER AUTOMATE
-  // =========================================================
+
   const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
   const URL_LISTAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/3fbf1a2a119441dabcb8c284dcae4cfe/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OdpmDoJPfT2zixNtGYBbnkZJkWrhs2pyVKgk1oPtOUI';
-  // =========================================================
+
 
   const form = document.getElementById('formPlano');
   const ICONE_CALENDARIO = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>';
@@ -229,7 +225,7 @@
   let todosOsItens = []; 
   let filtroAtual = 'todos'; 
 
-  // ===== COMUNICAÇÃO =====
+
   async function chamarFluxo(payload, url) { 
     const resposta = await fetch(url, {
       method: 'POST',
@@ -245,7 +241,7 @@
     return Object.fromEntries(new FormData(form).entries());
   }
 
-  // ===== CONTADORES =====
+
   function atualizarContadores() {
     form.querySelectorAll('textarea').forEach(t => {
       t.parentElement.querySelector('.contador').textContent = t.value.length + '/' + t.maxLength;
@@ -253,7 +249,7 @@
   }
   form.addEventListener('input', atualizarContadores);
 
-  // ===== FILTROS =====
+
   document.querySelectorAll('.filtros button').forEach(btn => {
     btn.addEventListener('click', (e) => {
       document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
@@ -263,7 +259,7 @@
     });
   });
 
-  // ===== LISTA DE FORMULÁRIOS =====
+
   function formatarData(valor) {
     if (!valor) return '';
     const d = new Date(valor);
@@ -285,7 +281,7 @@
       const res = await chamarFluxo({ acao: 'listar' }, URL_LISTAR); 
       const dadosBrutos = res.value || res.itens || res; 
       
-      // Filtro simples: mantém apenas itens que tenham algum dado (evita linhas em branco)
+
       todosOsItens = dadosBrutos.filter(item => {
         if (!item) return false;
         const texto = JSON.stringify(item);
@@ -351,7 +347,6 @@
     });
   }
 
-  // ===== ABRIR / NOVO =====
   function mostrarId() {
     document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
   }
@@ -392,7 +387,7 @@
     desenharLista();
   }
 
-  // ===== BOTOES =====
+
   document.getElementById('btnNovo').addEventListener('click', novoFormulario);
   document.getElementById('btnAtualizar').addEventListener('click', carregarFormularios);
 
