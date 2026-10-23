@@ -295,47 +295,71 @@
     }
   }
 
-  function desenharLista() {
-    const lista = document.getElementById('listaFormularios');
-    lista.innerHTML = '';
-
-    let itensFiltrados = todosOsItens;
-    if (filtroAtual === 'pendente') {
-      itensFiltrados = todosOsItens.filter(item => (item.Situacao || item.situacao || 'Pendente') !== 'Finalizado');
-    } else if (filtroAtual === 'finalizado') {
-      itensFiltrados = todosOsItens.filter(item => (item.Situacao || item.situacao) === 'Finalizado');
-    }
-
-    if (itensFiltrados.length === 0) {
-      lista.innerHTML = '<p class="vazio">Nenhum formulário encontrado.</p>';
-      return;
-    }
-
-    itensFiltrados.forEach(item => {
-      const idItem = item.ID || item.id || item.Id || 'N/A';
-      const statusItem = item.Situacao || item.situacao || 'Pendente';
-      const problemaItem = item.Problema || item.problema || 'Sem problema descrito';
-      const areaItem = item.Area || item.area || 'não definida';
-      
-      const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
-
-      const info = criar('div');
-      const isFinalizado = statusItem === 'Finalizado';
-      const badge = criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Incompleto');
-      
-      info.append(
-        badge,
-        criar('strong', '', problemaItem.length > 45 ? problemaItem.slice(0, 45) + '...' : problemaItem),
-        criar('p', '', 'Área: ' + areaItem),
-        criar('p', '', 'ID: ' + idItem)
-      );
-      
-      const data = formatarData(item.criadoEm || item.CriadoEm);
-      if (data) {
-        const linhaData = criar('p', 'data');
-        linhaData.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
-        linhaData.append(data);
-        info.append(linhaData);
+    function desenharLista() {
+      const lista = document.getElementById('listaFormularios');
+      lista.innerHTML = '';
+  
+      const pegarValor = (item, nomesPossiveis) => {
+        for (let nome of nomesPossiveis) {
+          if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
+            return item[nome];
+          }
+        }
+        const chaves = Object.keys(item);
+        for (let chave of chaves) {
+          if (nomesPossiveis.some(nome => chave.toLowerCase().includes(nome.toLowerCase()))) {
+            if (item[chave] !== undefined && item[chave] !== null && String(item[chave]).trim() !== '') {
+              return item[chave];
+            }
+          }
+        }
+        return null;
+      };
+  
+      let itensFiltrados = todosOsItens;
+      if (filtroAtual === 'pendente') {
+        itensFiltrados = todosOsItens.filter(item => {
+          const status = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
+          return status !== 'Finalizado';
+        });
+      } else if (filtroAtual === 'finalizado') {
+        itensFiltrados = todosOsItens.filter(item => {
+          const status = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']);
+          return status === 'Finalizado';
+        });
+      }
+  
+      if (itensFiltrados.length === 0) {
+        lista.innerHTML = '<p class="vazio">Nenhum formulário encontrado.</p>';
+        return;
+      }
+  
+      itensFiltrados.forEach(item => {
+        const idItem = pegarValor(item, ['ID', 'id', 'Id']) || 'N/A';
+        const statusItem = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
+        const problemaItem = pegarValor(item, ['Problema', 'problema']) || 'Sem problema descrito';
+        const areaItem = pegarValor(item, ['Area', 'area', 'Área', 'área']) || 'não definida';
+        
+        const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
+  
+        const info = criar('div');
+        const isFinalizado = String(statusItem).toLowerCase() === 'finalizado';
+        
+        const badge = criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Incompleto');
+        
+        info.append(
+          badge,
+          criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
+          criar('p', '', 'Área: ' + areaItem),
+          criar('p', '', 'ID: ' + idItem)
+        );
+        
+        const data = formatarData(pegarValor(item, ['criadoEm', 'CriadoEm', 'Data']));
+        if (data) {
+          const linhaData = criar('p', 'data');
+          linhaData.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
+          linhaData.append(data);
+          info.append(linhaData);
       }
 
       const botao = criar('button', 'b-azul', isFinalizado ? 'Visualizar' : 'Continuar');
@@ -346,7 +370,6 @@
       lista.appendChild(cartao);
     });
   }
-
   function mostrarId() {
     document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
   }
