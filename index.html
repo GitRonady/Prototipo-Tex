@@ -111,6 +111,63 @@
 
     .aviso-edicao { background: #fff3cd; color: var(--laranja); border: 1px solid #ffeeba; border-radius: 6px; padding: 10px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
     input.faltando, select.faltando, textarea.faltando { border-color: var(--laranja); background: #fffbf0; box-shadow: 0 0 0 3px #ffe3a3; }
+
+    input.preenchido, select.preenchido, textarea.preenchido { background: #eef5ef; border-color: #b7d7bf; color: #4a5a50; }
+    select.preenchido, input[type="date"].preenchido { pointer-events: none; }
+    .aviso-edicao .btn-liberar { background: none; border: none; color: var(--azul); text-decoration: underline; font-size: 14px; padding: 0 0 0 8px; }
+    .aviso-edicao button[hidden] { display: none; }
+    /* Tela menor: reduz tamanhos de letras, espaços, campos e botões */
+    body { padding: 8px; }
+    .layout { gap: 12px; height: calc(100vh - 16px); }
+    @media (min-width: 901px) {
+      .layout { grid-template-columns: minmax(0, 700px) minmax(0, 340px); justify-content: center; }
+    }
+    @media (max-width: 900px) {
+      .layout { height: auto; }
+    }
+
+    /* títulos e faixas azuis */
+    .cabecalho { padding: 12px 22px 10px; }
+    .cabecalho h1 { font-size: 24px; padding-bottom: 6px; }
+    .cabecalho h1::after { width: 60px; height: 2px; }
+    .cabecalho.lista { padding: 10px 16px; }
+    .cabecalho.lista h2 { font-size: 16px; gap: 8px; }
+    .cabecalho.lista h2 .ic { font-size: 20px; }
+    .b-atualizar { font-size: 12px; }
+    .corpo { padding: 12px; }
+
+    /* formulário */
+    .caixa { padding: 14px 14px 10px; }
+    .topo { margin-bottom: 10px; }
+    .topo h2 { font-size: 18px; gap: 10px; }
+    .topo h2 .ic { font-size: 26px; }
+    .idbox { padding: 6px 10px; min-width: 120px; }
+    .idbox small { font-size: 11px; }
+    .idbox span { font-size: 13px; }
+    label { font-size: 13px; margin-bottom: 3px; }
+    input, select, textarea { padding: 6px 9px; font-size: 13px; }
+    textarea { min-height: 56px; }
+    .campo { margin-bottom: 8px; }
+    .contador { font-size: 11px; margin-top: 2px; }
+    .linha { gap: 10px; }
+    .botoes { gap: 8px; padding-top: 10px; margin-top: 4px; }
+    .botoes button { flex: 1 1 130px; }
+    button { font-size: 13px; padding: 7px 12px; gap: 6px; }
+    .aviso-edicao { padding: 7px 10px; font-size: 13px; margin-bottom: 10px; }
+
+    /* lista da direita */
+    .info { padding: 8px 12px; font-size: 13px; gap: 8px; margin-bottom: 10px; }
+    .info .ic { font-size: 18px; }
+    .filtros { margin-bottom: 10px; }
+    .filtros button { padding: 5px; font-size: 12px; }
+    .item { padding: 6px 10px; margin-bottom: 6px; }
+    .item.ativo { padding: 5px 9px; }
+    .item strong { font-size: 13px; }
+    .item p { font-size: 11px; }
+    .item button { padding: 5px 10px; font-size: 12px; }
+    .vazio { font-size: 13px; }
+    .paginacao { font-size: 12px; }
+    .paginacao button { padding: 4px 10px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -128,7 +185,10 @@
             <div class="idbox"><small>ID do formulário:</small><span id="idForm">(novo)</span></div>
           </div>
 
-          <div class="aviso-edicao" id="avisoEdicao" hidden></div>
+          <div class="aviso-edicao" id="avisoEdicao" hidden>
+            <span id="textoAvisoEdicao"></span>
+            <button type="button" class="btn-liberar" id="btnLiberar" hidden>Editar campos já preenchidos</button>
+          </div>
 
           <div class="campo">
             <label for="area">Area responsavel<b>*</b></label>
@@ -190,7 +250,7 @@
 
           <div class="campo">
             <label for="comentario">Comentario de Acompanhamento</label>
-            <textarea id="comentario" name="comentario" maxlength="500" placeholder="Atualização mais recente" style="min-height:60px"></textarea>
+            <textarea id="comentario" name="comentario" maxlength="500" placeholder="Atualização mais recente" style="min-height:40px"></textarea>
             <div class="contador"></div>
           </div>
 
@@ -257,6 +317,8 @@
 
   const POR_PAGINA = 5;
   let paginaAtual = 1;
+
+  let idFormulario = '';
 
 
   async function chamarFluxo(payload, url) {
@@ -325,6 +387,11 @@
 
       todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
 
+      if (!idEmEdicao && todosOsItens.some(item => lerIdFormulario(item) === idFormulario)) {
+        idFormulario = gerarIdFormulario();
+        mostrarId();
+      }
+
       desenharLista();
     } catch (erro) {
       console.error(erro);
@@ -392,7 +459,7 @@
       info.append(
         badge,
         criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
-        criar('p', '', 'Área: ' + areaItem + '  •  ID: ' + idItem)
+        criar('p', '', 'Área: ' + areaItem + '  •  ID: ' + (lerIdFormulario(item) || idItem))
       );
 
       const data = formatarData(pegarValor(item, ['criadoEm', 'CriadoEm', 'Data']));
@@ -431,11 +498,54 @@
     }
   }
 
+  function lerIdFormulario(item) {
+    for (const chave of Object.keys(item)) {
+      if (chave.toLowerCase().replace(/[^a-z]/g, '') === 'idformulario' && item[chave]) {
+        return String(item[chave]);
+      }
+    }
+    return '';
+  }
+
+  function gerarIdFormulario() {
+    let id;
+    do {
+      id = String(Math.floor(100000 + Math.random() * 900000));
+    } while (todosOsItens.some(item => lerIdFormulario(item) === id));
+    return id;
+  }
+
   const ORDEM_CAMPOS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao', 'comentario'];
   const OBRIGATORIOS = ['area', 'problema', 'causa', 'plano', 'responsavel'];
 
+  const CAMPOS_TRAVAVEIS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao'];
+
+  function travarPreenchidos() {
+    let travados = 0;
+    CAMPOS_TRAVAVEIS.forEach(nome => {
+      const campo = form.elements[nome];
+      if (campo.value.trim() !== '') {
+        campo.classList.add('preenchido');
+        if (campo.tagName !== 'SELECT') campo.readOnly = true;   // readOnly ainda envia o valor (disabled não enviaria)
+        campo.tabIndex = -1;                                      // o Tab pula os campos travados
+        travados++;
+      }
+    });
+    return travados;
+  }
+
+  function destravarCampos() {
+    CAMPOS_TRAVAVEIS.forEach(nome => {
+      const campo = form.elements[nome];
+      campo.classList.remove('preenchido');
+      campo.readOnly = false;
+      campo.removeAttribute('tabindex');
+    });
+  }
+
   function limparAvisoEdicao() {
     form.querySelectorAll('.faltando').forEach(c => c.classList.remove('faltando'));
+    destravarCampos();
     document.getElementById('avisoEdicao').hidden = true;
   }
 
@@ -453,10 +563,13 @@
 
     // 3) mostra a faixa amarela com o ID
     const aviso = document.getElementById('avisoEdicao');
-    aviso.textContent = faltando.length > 0
-      ? 'Continuando o formulário ID ' + idEmEdicao + '. Complete os campos destacados em laranja.'
-      : 'Editando o formulário ID ' + idEmEdicao + '. Todos os campos obrigatórios já estão preenchidos.';
+    document.getElementById('textoAvisoEdicao').textContent = faltando.length > 0
+      ? 'Continuando o formulário ID ' + idFormulario + '. Os campos já preenchidos estão travados. Complete os campos destacados em laranja.'
+      : 'Editando o formulário ID ' + idFormulario + '. Todos os campos obrigatórios já estão preenchidos.';
     aviso.hidden = false;
+
+    const travados = travarPreenchidos();
+    document.getElementById('btnLiberar').hidden = travados === 0;
 
     // 4) rola a tela até o campo e coloca o cursor nele
     alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -464,7 +577,7 @@
   }
 
   function mostrarId() {
-    document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
+    document.getElementById('idForm').textContent = idFormulario;
   }
 
   function abrirFormulario(item) {
@@ -499,6 +612,7 @@
 
 
     idEmEdicao = pegarValor(['ID', 'id', 'Id']);
+    idFormulario = lerIdFormulario(item) || gerarIdFormulario();
 
 
     mostrarId();
@@ -513,6 +627,7 @@
     form.reset();
     limparAvisoEdicao();
     idEmEdicao = null;
+    idFormulario = gerarIdFormulario();
     mostrarId();
     atualizarContadores();
     desenharLista();
@@ -520,6 +635,10 @@
 
 
   document.getElementById('btnNovo').addEventListener('click', novoFormulario);
+  document.getElementById('btnLiberar').addEventListener('click', () => {
+    destravarCampos();
+    document.getElementById('btnLiberar').hidden = true;
+  });
   document.getElementById('btnAtualizar').addEventListener('click', carregarFormularios);
 
   document.getElementById('btnIncompleto').addEventListener('click', async function () {
@@ -530,7 +649,7 @@
     }
     this.disabled = true;
     try {
-      await chamarFluxo({ ...dados, acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, situacao: 'Pendente' }, URL_SALVAR);
+      await chamarFluxo({ ...dados, acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, idFormulario: idFormulario, situacao: 'Pendente' }, URL_SALVAR);
       alert('Formulário salvo como incompleto.');
       novoFormulario();
       carregarFormularios();
@@ -546,7 +665,7 @@
     const botao = document.getElementById('btnConcluir');
     botao.disabled = true;
     try {
-      await chamarFluxo({ ...lerCampos(), acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, situacao: 'Finalizado' }, URL_SALVAR);
+      await chamarFluxo({ ...lerCampos(), acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, idFormulario: idFormulario, situacao: 'Finalizado' }, URL_SALVAR);
       alert('Plano de ação salvo com sucesso!');
       novoFormulario();
       carregarFormularios();
@@ -557,6 +676,8 @@
     botao.disabled = false;
   });
 
+  idFormulario = gerarIdFormulario();
+  mostrarId();
   atualizarContadores();
   carregarFormularios();
 </script>
