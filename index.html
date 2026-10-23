@@ -269,7 +269,7 @@
     return e;
   }
 
-  async function carregarFormularios() {
+    async function carregarFormularios() {
     const lista = document.getElementById('listaFormularios');
     lista.innerHTML = '<p class="vazio">Carregando...</p>';
     try {
@@ -277,11 +277,16 @@
       
       const dadosBrutos = res.value || res.itens || res; 
       
-      todosOsItens = dadosBrutos.filter(item => {
-        const temProblema = item.problema || item.Problema;
-        const temArea = item.area || item.Area;
-        return (temProblema && String(temProblema).trim() !== '') || (temArea && String(temArea).trim() !== '');
-      });
+      console.log("DADOS RECEBIDOS DO EXCEL:", dadosBrutos); 
+      
+      todosOsItens = dadosBrutos;
+      
+      desenharLista();
+    } catch (erro) {
+      console.error(erro);
+      lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
+    }
+  }
       
       desenharLista();
     } catch (erro) {
