@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Formulário Plano de Ação</title>
+
+
   <style>
     :root {
       --azul: #181D3E;
@@ -21,34 +23,34 @@
     body { margin: 0; padding: 14px; background: var(--fundo); font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto); }
     svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-    .layout { 
-      display: grid; 
-      grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); 
-      gap: 16px; 
-      align-items: start; 
-      max-width: 1400px; 
-      margin: 0 auto; 
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+      max-width: 1400px;
+      margin: 0 auto;
       height: calc(100vh - 28px);
     }
     @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
-    .painel { 
-      background: #fff; 
-      border: 1px solid var(--borda); 
-      border-radius: 4px; 
-      overflow: hidden; 
-      box-shadow: 0 1px 3px rgba(24,29,62,.08); 
-      display: flex;         
+    .painel {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(24,29,62,.08);
+      display: flex;
       flex-direction: column;
-    }    
+    }
     .cabecalho { background: var(--azul); color: #fff; padding: 22px 36px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .cabecalho h1 { margin: 0; font-size: 34px; position: relative; padding-bottom: 8px; }
     .cabecalho h1::after { content: ""; position: absolute; left: 0; bottom: 0; width: 85px; height: 3px; background: var(--vermelho); }
     .cabecalho.lista { padding: 16px 22px; }
     .cabecalho.lista h2 { margin: 0; font-size: 21px; display: flex; align-items: center; gap: 10px; }
     .cabecalho.lista h2 .ic { font-size: 28px; }
-    .corpo { 
-      padding: 18px; 
+    .corpo {
+      padding: 18px;
       overflow-y: auto;
     }
 
@@ -81,27 +83,34 @@
     .b-vermelho { background: var(--vermelho); color: #fff; }
     .b-atualizar { background: none; color: #fff; padding: 4px 0; font-size: 14px; font-weight: 600; border: none; }
 
-    
+
     .info { background: #e3eefb; color: #1b3a73; border-radius: 6px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; font-size: 15px; margin-bottom: 14px; }
     .info .ic { font-size: 24px; color: var(--destaque); }
-    
-    
+
+
     .filtros { display: flex; gap: 8px; margin-bottom: 14px; }
     .filtros button { flex: 1; padding: 8px; font-size: 13px; background: #fff; color: var(--suave); border: 1px solid var(--borda); }
     .filtros button.ativo { background: var(--destaque); color: #fff; border-color: var(--destaque); }
 
-    .item { border: 1px solid var(--borda); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; }
-    .item.ativo { border: 2px solid var(--destaque); background: var(--selecao); padding: 13px 15px; }
-    .item strong { display: block; font-size: 15px; margin-bottom: 4px; }
-    .item p { margin: 2px 0; font-size: 14px; color: var(--suave); }
-    .item .data { display: flex; align-items: center; gap: 8px; }
-    .item button { padding: 9px 18px; font-size: 14px; flex: none; }
+    .item { border: 1px solid var(--borda); border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff; }
+    .item.ativo { border: 2px solid var(--destaque); background: var(--selecao); padding: 7px 11px; }
+    .item strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .item p { margin: 0; font-size: 12px; color: var(--suave); }
+    .item .data { display: flex; align-items: center; gap: 6px; }
+    .item button { padding: 6px 12px; font-size: 13px; flex: none; }
     .vazio { color: var(--suave); font-size: 14px; margin: 8px 0; }
 
-   
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; }
+
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 12px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; }
     .badge.pendente { background: #fff3cd; color: var(--laranja); border: 1px solid #ffeeba; }
     .badge.finalizado { background: #d4edda; color: var(--verde); border: 1px solid #c3e6cb; }
+
+    .paginacao { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--suave); }
+    .paginacao button { padding: 6px 12px; font-size: 13px; background: #fff; color: var(--azul); border: 1px solid var(--borda); }
+    .paginacao button:disabled { cursor: not-allowed; }
+
+    .aviso-edicao { background: #fff3cd; color: var(--laranja); border: 1px solid #ffeeba; border-radius: 6px; padding: 10px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+    input.faltando, select.faltando, textarea.faltando { border-color: var(--laranja); background: #fffbf0; box-shadow: 0 0 0 3px #ffe3a3; }
   </style>
 </head>
 <body>
@@ -118,6 +127,8 @@
             </h2>
             <div class="idbox"><small>ID do formulário:</small><span id="idForm">(novo)</span></div>
           </div>
+
+          <div class="aviso-edicao" id="avisoEdicao" hidden></div>
 
           <div class="campo">
             <label for="area">Area responsavel<b>*</b></label>
@@ -201,7 +212,7 @@
       </div>
     </section>
 
- 
+
     <section class="painel">
       <div class="cabecalho lista">
         <h2>
@@ -240,12 +251,15 @@
   const form = document.getElementById('formPlano');
   const ICONE_CALENDARIO = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>';
 
-  let idEmEdicao = null; 
-  let todosOsItens = []; 
-  let filtroAtual = 'todos'; 
+  let idEmEdicao = null;
+  let todosOsItens = [];
+  let filtroAtual = 'todos';
+
+  const POR_PAGINA = 5;
+  let paginaAtual = 1;
 
 
-  async function chamarFluxo(payload, url) { 
+  async function chamarFluxo(payload, url) {
     const resposta = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -267,6 +281,7 @@
     });
   }
   form.addEventListener('input', atualizarContadores);
+  form.addEventListener('input', e => e.target.classList.remove('faltando'));
 
 
   document.querySelectorAll('.filtros button').forEach(btn => {
@@ -274,6 +289,7 @@
       document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
       e.target.classList.add('ativo');
       filtroAtual = e.target.dataset.filtro;
+      paginaAtual = 1;
       desenharLista();
     });
   });
@@ -297,16 +313,18 @@
     const lista = document.getElementById('listaFormularios');
     lista.innerHTML = '<p class="vazio">Carregando...</p>';
     try {
-      const res = await chamarFluxo({ acao: 'listar' }, URL_LISTAR); 
-      const dadosBrutos = res.value || res.itens || res; 
-      
+      const res = await chamarFluxo({ acao: 'listar' }, URL_LISTAR);
+      const dadosBrutos = res.value || res.itens || res;
+
 
       todosOsItens = dadosBrutos.filter(item => {
         if (!item) return false;
         const texto = JSON.stringify(item);
         return texto.includes('problema') || texto.includes('Problema') || texto.includes('area') || texto.includes('Area');
       });
-      
+
+      todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
+
       desenharLista();
     } catch (erro) {
       console.error(erro);
@@ -314,71 +332,75 @@
     }
   }
 
-    function desenharLista() {
-      const lista = document.getElementById('listaFormularios');
-      lista.innerHTML = '';
-  
-      const pegarValor = (item, nomesPossiveis) => {
-        for (let nome of nomesPossiveis) {
-          if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
-            return item[nome];
+  function desenharLista() {
+    const lista = document.getElementById('listaFormularios');
+    lista.innerHTML = '';
+
+    const pegarValor = (item, nomesPossiveis) => {
+      for (let nome of nomesPossiveis) {
+        if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
+          return item[nome];
+        }
+      }
+      const chaves = Object.keys(item);
+      for (let chave of chaves) {
+        if (nomesPossiveis.some(nome => chave.toLowerCase().includes(nome.toLowerCase()))) {
+          if (item[chave] !== undefined && item[chave] !== null && String(item[chave]).trim() !== '') {
+            return item[chave];
           }
         }
-        const chaves = Object.keys(item);
-        for (let chave of chaves) {
-          if (nomesPossiveis.some(nome => chave.toLowerCase().includes(nome.toLowerCase()))) {
-            if (item[chave] !== undefined && item[chave] !== null && String(item[chave]).trim() !== '') {
-              return item[chave];
-            }
-          }
-        }
-        return null;
-      };
-  
-      let itensFiltrados = todosOsItens;
-      if (filtroAtual === 'pendente') {
-        itensFiltrados = todosOsItens.filter(item => {
-          const status = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
-          return status !== 'Finalizado';
-        });
-      } else if (filtroAtual === 'finalizado') {
-        itensFiltrados = todosOsItens.filter(item => {
-          const status = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']);
-          return status === 'Finalizado';
-        });
       }
-  
-      if (itensFiltrados.length === 0) {
-        lista.innerHTML = '<p class="vazio">Nenhum formulário encontrado.</p>';
-        return;
-      }
-  
-      itensFiltrados.forEach(item => {
-        const idItem = pegarValor(item, ['ID', 'id', 'Id']) || 'N/A';
-        const statusItem = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
-        const problemaItem = pegarValor(item, ['Problema', 'problema']) || 'Sem problema descrito';
-        const areaItem = pegarValor(item, ['Area', 'area', 'Área', 'área']) || 'não definida';
-        
-        const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
-  
-        const info = criar('div');
-        const isFinalizado = String(statusItem).toLowerCase() === 'finalizado';
-        
-        const badge = criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Incompleto');
-        
-        info.append(
-          badge,
-          criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
-          criar('p', '', 'Área: ' + areaItem),
-          criar('p', '', 'ID: ' + idItem)
-        );
-        
-        const data = formatarData(pegarValor(item, ['criadoEm', 'CriadoEm', 'Data']));
-        if (data) {
-          const linhaData = criar('p', 'data');
-          linhaData.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
-          linhaData.append(data);
-          info.append(linhaData);
+      return null;
+    };
+
+    let itensFiltrados = todosOsItens;
+    if (filtroAtual === 'pendente') {
+      itensFiltrados = todosOsItens.filter(item => {
+        const status = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
+        return status !== 'Finalizado';
+      });
+    } else if (filtroAtual === 'finalizado') {
+      itensFiltrados = todosOsItens.filter(item => {
+        const status = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']);
+        return status === 'Finalizado';
+      });
+    }
+
+    if (itensFiltrados.length === 0) {
+      lista.innerHTML = '<p class="vazio">Nenhum formulário encontrado.</p>';
+      return;
+    }
+
+    const totalPaginas = Math.ceil(itensFiltrados.length / POR_PAGINA);
+    if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+    const inicio = (paginaAtual - 1) * POR_PAGINA;
+    const itensDaPagina = itensFiltrados.slice(inicio, inicio + POR_PAGINA);
+
+    itensDaPagina.forEach(item => {
+      const idItem = pegarValor(item, ['ID', 'id', 'Id']) || 'N/A';
+      const statusItem = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
+      const problemaItem = pegarValor(item, ['Problema', 'problema']) || 'Sem problema descrito';
+      const areaItem = pegarValor(item, ['Area', 'area', 'Área', 'área']) || 'não definida';
+
+      const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
+
+      const info = criar('div');
+      const isFinalizado = String(statusItem).toLowerCase() === 'finalizado';
+
+      const badge = criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Incompleto');
+
+      info.append(
+        badge,
+        criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
+        criar('p', '', 'Área: ' + areaItem + '  •  ID: ' + idItem)
+      );
+
+      const data = formatarData(pegarValor(item, ['criadoEm', 'CriadoEm', 'Data']));
+      if (data) {
+        const linhaData = criar('p', 'data');
+        linhaData.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
+        linhaData.append(data);
+        info.append(linhaData);
       }
 
       const botao = criar('button', 'b-azul', isFinalizado ? 'Visualizar' : 'Continuar');
@@ -388,55 +410,108 @@
       cartao.append(info, botao);
       lista.appendChild(cartao);
     });
+
+    if (totalPaginas > 1) {
+      const nav = criar('div', 'paginacao');
+
+      const anterior = criar('button', '', '← Anterior');
+      anterior.type = 'button';
+      anterior.disabled = paginaAtual === 1;
+      anterior.addEventListener('click', () => { paginaAtual--; desenharLista(); });
+
+      const texto = criar('span', '', 'Página ' + paginaAtual + ' de ' + totalPaginas);
+
+      const proxima = criar('button', '', 'Próxima →');
+      proxima.type = 'button';
+      proxima.disabled = paginaAtual === totalPaginas;
+      proxima.addEventListener('click', () => { paginaAtual++; desenharLista(); });
+
+      nav.append(anterior, texto, proxima);
+      lista.appendChild(nav);
+    }
   }
+
+  const ORDEM_CAMPOS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao', 'comentario'];
+  const OBRIGATORIOS = ['area', 'problema', 'causa', 'plano', 'responsavel'];
+
+  function limparAvisoEdicao() {
+    form.querySelectorAll('.faltando').forEach(c => c.classList.remove('faltando'));
+    document.getElementById('avisoEdicao').hidden = true;
+  }
+
+  function focarOndeParou() {
+    limparAvisoEdicao();
+
+    // 1) marca em laranja os campos obrigatórios que ainda estão vazios
+    const faltando = OBRIGATORIOS.filter(nome => form.elements[nome].value.trim() === '');
+    faltando.forEach(nome => form.elements[nome].classList.add('faltando'));
+
+    // 2) o primeiro campo vazio (na ordem da tela) é onde a pessoa parou.
+    //    Se estiver tudo preenchido, vai para o comentário de acompanhamento
+    const primeiroVazio = ORDEM_CAMPOS.find(nome => form.elements[nome].value.trim() === '');
+    const alvo = form.elements[primeiroVazio || 'comentario'];
+
+    // 3) mostra a faixa amarela com o ID
+    const aviso = document.getElementById('avisoEdicao');
+    aviso.textContent = faltando.length > 0
+      ? 'Continuando o formulário ID ' + idEmEdicao + '. Complete os campos destacados em laranja.'
+      : 'Editando o formulário ID ' + idEmEdicao + '. Todos os campos obrigatórios já estão preenchidos.';
+    aviso.hidden = false;
+
+    // 4) rola a tela até o campo e coloca o cursor nele
+    alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    alvo.focus({ preventScroll: true });
+  }
+
   function mostrarId() {
     document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
   }
 
-    function abrirFormulario(item) {
-   
-      form.reset();
-      
-    
-      const pegarValor = (nomes) => {
-        for (let nome of nomes) {
-          if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
-            return item[nome];
-          }
+  function abrirFormulario(item) {
+
+    form.reset();
+
+
+    const pegarValor = (nomes) => {
+      for (let nome of nomes) {
+        if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
+          return item[nome];
         }
-        return '';
-      };
-  
-     
-      form.elements['area'].value = pegarValor(['Area', 'area', 'Área']);
-      form.elements['problema'].value = pegarValor(['Problema', 'problema']);
-      form.elements['causa'].value = pegarValor(['Causa', 'causa']);
-      form.elements['plano'].value = pegarValor(['Plano', 'plano', 'Plano de ação']);
-      form.elements['responsavel'].value = pegarValor(['Responsavel', 'responsavel']);
-      form.elements['status'].value = pegarValor(['Status', 'status']) || 'Aberto';
-      form.elements['comentario'].value = pegarValor(['Comentario', 'comentario']);
-      
-      
-      const prazo = pegarValor(['Prazo', 'prazo']);
-      if (prazo) form.elements['prazo'].value = String(prazo).slice(0, 10);
-      
-      const dataConclusao = pegarValor(['DataConclusao', 'dataConclusao', 'Data de Conclusão']);
-      if (dataConclusao) form.elements['dataConclusao'].value = String(dataConclusao).slice(0, 10);
-  
-      
-      idEmEdicao = pegarValor(['ID', 'id', 'Id']);
-      
-      
-      mostrarId();
-      atualizarContadores();
-      desenharLista();
-      
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return '';
+    };
+
+
+    form.elements['area'].value = pegarValor(['Area', 'area', 'Área']);
+    form.elements['problema'].value = pegarValor(['Problema', 'problema']);
+    form.elements['causa'].value = pegarValor(['Causa', 'causa']);
+    form.elements['plano'].value = pegarValor(['Plano', 'plano', 'Plano de ação']);
+    form.elements['responsavel'].value = pegarValor(['Responsavel', 'responsavel']);
+    form.elements['status'].value = pegarValor(['Status', 'status']) || 'Aberto';
+    form.elements['comentario'].value = pegarValor(['Comentario', 'comentario']);
+
+
+    const prazo = pegarValor(['Prazo', 'prazo']);
+    if (prazo) form.elements['prazo'].value = String(prazo).slice(0, 10);
+
+    const dataConclusao = pegarValor(['DataConclusao', 'dataConclusao', 'Data de Conclusão']);
+    if (dataConclusao) form.elements['dataConclusao'].value = String(dataConclusao).slice(0, 10);
+
+
+    idEmEdicao = pegarValor(['ID', 'id', 'Id']);
+
+
+    mostrarId();
+    atualizarContadores();
+    desenharLista();
+
+
+    focarOndeParou();
   }
 
   function novoFormulario() {
     form.reset();
+    limparAvisoEdicao();
     idEmEdicao = null;
     mostrarId();
     atualizarContadores();
@@ -467,7 +542,7 @@
   });
 
   form.addEventListener('submit', async function (e) {
-    e.preventDefault(); 
+    e.preventDefault();
     const botao = document.getElementById('btnConcluir');
     botao.disabled = true;
     try {
