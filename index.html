@@ -2,24 +2,25 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title> Formulario Plano de Ação </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulário Plano de Ação</title>
   <style>
     :root {
       --azul: #181D3E;
-      --vermelho: #eef1f6;
+      --vermelho: #D4202A;
       --fundo: #eef1f6;
       --borda: #d5dae3;
       --texto: #1b2147;
       --suave: #5b6382;
-      --selecao:  #e6effd;
+      --selecao: #e6effd;
       --destaque: #1f56c4;
     }
-    * {box-sizing: border-box; }
-    body margin: 0 padding: 14px; background: var(--fundo); font-family: font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto)
-    svg.ic { wdith: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 14px; background: var(--fundo); font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto); }
+    svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-    .layout { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap:16px; align-items: start; max-width: 1400px; margin: 0 auto;}
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr;}}
+    .layout { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 16px; align-items: start; max-width: 1400px; margin: 0 auto; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
     .painel { background: #fff; border: 1px solid var(--borda); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(24,29,62,.08); }
     .cabecalho { background: var(--azul); color: #fff; padding: 22px 36px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -27,9 +28,10 @@
     .cabecalho h1::after { content: ""; position: absolute; left: 0; bottom: 0; width: 85px; height: 3px; background: var(--vermelho); }
     .cabecalho.lista { padding: 16px 22px; }
     .cabecalho.lista h2 { margin: 0; font-size: 21px; display: flex; align-items: center; gap: 10px; }
-    .cabecalho.lista h2 .ic {font-size: 28px; }
+    .cabecalho.lista h2 .ic { font-size: 28px; }
     .corpo { padding: 18px; }
 
+    /* formulário */
     .caixa { border: 1px solid var(--borda); border-radius: 6px; padding: 20px 20px 16px; }
     .topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
     .topo h2 { margin: 0; font-size: 24px; display: flex; align-items: center; gap: 14px; }
@@ -37,7 +39,7 @@
     .idbox { background: #eef0f4; border-radius: 6px; padding: 10px 14px; min-width: 160px; }
     .idbox small { display: block; color: var(--suave); font-size: 12px; }
     .idbox span { font-size: 15px; }
- 
+
     label { display: block; font-weight: 700; font-size: 15px; margin: 0 0 6px; }
     label b { color: var(--vermelho); font-weight: 700; }
     input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 5px; font-family: inherit; font-size: 14px; color: var(--texto); background: #fff; }
@@ -47,7 +49,7 @@
     .contador { text-align: right; font-size: 12px; color: var(--suave); margin-top: 3px; }
     .linha { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 600px) { .linha { grid-template-columns: 1fr; } .topo { flex-direction: column; align-items: flex-start; } }
- 
+
     .botoes { display: flex; flex-wrap: wrap; gap: 14px; border-top: 1px solid var(--borda); margin-top: 8px; padding-top: 16px; }
     .botoes button { flex: 1 1 160px; }
     button { font-family: inherit; font-size: 15px; font-weight: 700; border-radius: 5px; padding: 11px 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid transparent; }
@@ -58,10 +60,11 @@
     .b-vermelho { background: var(--vermelho); color: #fff; }
     .b-atualizar { background: none; color: #fff; padding: 4px 0; font-size: 14px; font-weight: 600; border: none; }
 
+    /* lista */
     .info { background: #e3eefb; color: #1b3a73; border-radius: 6px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; font-size: 15px; margin-bottom: 14px; }
     .info .ic { font-size: 24px; color: var(--destaque); }
     .item { border: 1px solid var(--borda); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; }
-    .item.ativo { border: 2px solid var(--destaque); background: var(--selecao); padding: 13px 15px;}
+    .item.ativo { border: 2px solid var(--destaque); background: var(--selecao); padding: 13px 15px; }
     .item strong { display: block; font-size: 15px; margin-bottom: 4px; }
     .item p { margin: 2px 0; font-size: 14px; color: var(--suave); }
     .item .data { display: flex; align-items: center; gap: 8px; }
@@ -71,19 +74,20 @@
 </head>
 <body>
   <div class="layout">
- 
+
+    <!-- FORMULÁRIO -->
     <section class="painel">
       <div class="cabecalho"><h1>Plano de Ação</h1></div>
       <div class="corpo">
         <form id="formPlano" class="caixa">
           <div class="topo">
             <h2>
-              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>                
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
               Dados do Plano de Ação
             </h2>
             <div class="idbox"><small>ID do formulário:</small><span id="idForm">(novo)</span></div>
           </div>
- 
+
           <div class="campo">
             <label for="area">Area responsavel<b>*</b></label>
             <select id="area" name="area" required>
@@ -96,25 +100,25 @@
               <option>Outras Areas</option>
             </select>
           </div>
-    
+
           <div class="campo">
             <label for="problema">Problema Identificado<b>*</b></label>
             <textarea id="problema" name="problema" maxlength="500" placeholder="Descreva o problema operacional..." required></textarea>
             <div class="contador"></div>
           </div>
- 
+
           <div class="campo">
             <label for="causa">Causa Raiz<b>*</b></label>
             <textarea id="causa" name="causa" maxlength="500" placeholder="Qual é a causa identificada?" required></textarea>
             <div class="contador"></div>
           </div>
- 
+
           <div class="campo">
             <label for="plano">Plano de ação<b>*</b></label>
             <textarea id="plano" name="plano" maxlength="500" placeholder="O que será feito para resolver o problema?" required></textarea>
             <div class="contador"></div>
           </div>
- 
+
           <div class="linha">
             <div class="campo">
               <label for="responsavel">Responsavel<b>*</b></label>
@@ -125,7 +129,7 @@
               <input type="date" id="prazo" name="prazo">
             </div>
           </div>
- 
+
           <div class="linha">
             <div class="campo">
               <label for="status">Status</label>
@@ -141,39 +145,41 @@
               <input type="date" id="dataConclusao" name="dataConclusao">
             </div>
           </div>
- 
+
           <div class="campo">
             <label for="comentario">Comentario de Acompanhamento</label>
             <textarea id="comentario" name="comentario" maxlength="500" placeholder="Atualização mais recente" style="min-height:60px"></textarea>
             <div class="contador"></div>
           </div>
- 
+
           <div class="botoes">
             <button type="button" class="b-claro" id="btnNovo">
               <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-              
+              Novo formulário
             </button>
             <button type="button" class="b-azul" id="btnIncompleto">
               <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              
+              Salvar como incompleto
             </button>
             <button type="submit" class="b-vermelho" id="btnConcluir">
               <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              
+              Concluir formulário
             </button>
           </div>
         </form>
       </div>
     </section>
+
+    <!-- FORMULÁRIOS INCOMPLETOS -->
     <section class="painel">
       <div class="cabecalho lista">
         <h2>
           <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-         
+          Formulários Incompletos
         </h2>
         <button type="button" class="b-atualizar" id="btnAtualizar">
           <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-          
+          Atualizar lista
         </button>
       </div>
       <div class="corpo">
@@ -184,20 +190,21 @@
         <div id="listaIncompletos"><p class="vazio">Carregando...</p></div>
       </div>
     </section>
- 
+
   </div>
- 
+
 <script>
-  // CONFIGURAÇÃO 
+  // ===== CONFIGURAÇÃO =====
+  // Mesmo fluxo de antes. Ele recebe o campo "acao" (criar, atualizar ou listar).
   const URL_FLUXO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
- 
+
   const form = document.getElementById('formPlano');
   const ICONE_CALENDARIO = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>';
- 
+
   let idEmEdicao = null; // null = formulário novo
   let itensIncompletos = [];
- 
-  //  COMUNICAÇÃO COM O POWER AUTOMATE 
+
+  // ===== COMUNICAÇÃO COM O POWER AUTOMATE =====
   async function chamarFluxo(payload) {
     const resposta = await fetch(URL_FLUXO, {
       method: 'POST',
@@ -208,34 +215,34 @@
     const texto = await resposta.text();
     return texto ? JSON.parse(texto) : {};
   }
- 
+
   function lerCampos() {
     return Object.fromEntries(new FormData(form).entries());
   }
- 
-  //  CONTADORES DE CARACTERES 
+
+  // ===== CONTADORES DE CARACTERES =====
   function atualizarContadores() {
     form.querySelectorAll('textarea').forEach(t => {
       t.parentElement.querySelector('.contador').textContent = t.value.length + '/' + t.maxLength;
     });
   }
   form.addEventListener('input', atualizarContadores);
- 
-  //  LISTA DE INCOMPLETOS 
+
+  // ===== LISTA DE INCOMPLETOS =====
   function formatarData(valor) {
     if (!valor) return '';
     const d = new Date(valor);
     if (isNaN(d)) return '';
     return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
   }
- 
+
   function criar(tag, classe, texto) {
     const e = document.createElement(tag);
     if (classe) e.className = classe;
     if (texto !== undefined) e.textContent = texto;
     return e;
   }
- 
+
   async function carregarIncompletos() {
     const lista = document.getElementById('listaIncompletos');
     lista.innerHTML = '<p class="vazio">Carregando...</p>';
@@ -248,7 +255,7 @@
       lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
     }
   }
- 
+
   function desenharLista() {
     const lista = document.getElementById('listaIncompletos');
     lista.innerHTML = '';
@@ -258,7 +265,7 @@
     }
     itensIncompletos.forEach(item => {
       const cartao = criar('div', 'item' + (String(item.id) === String(idEmEdicao) ? ' ativo' : ''));
- 
+
       const info = criar('div');
       const problema = item.problema || 'Sem problema descrito';
       info.append(
@@ -273,21 +280,21 @@
         linhaData.append(data);
         info.append(linhaData);
       }
- 
+
       const botao = criar('button', 'b-azul', 'Continuar');
       botao.type = 'button';
       botao.addEventListener('click', () => abrirIncompleto(item));
- 
+
       cartao.append(info, botao);
       lista.appendChild(cartao);
     });
   }
- 
-  //  ABRIR / NOVO 
+
+  // ===== ABRIR / NOVO =====
   function mostrarId() {
     document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
   }
- 
+
   function abrirIncompleto(item) {
     form.reset();
     ['area', 'problema', 'causa', 'plano', 'responsavel', 'status', 'comentario'].forEach(campo => {
@@ -296,14 +303,14 @@
     // campos de data precisam estar no formato AAAA-MM-DD
     if (item.prazo) form.elements.prazo.value = String(item.prazo).slice(0, 10);
     if (item.dataConclusao) form.elements.dataConclusao.value = String(item.dataConclusao).slice(0, 10);
- 
+
     idEmEdicao = item.id;
     mostrarId();
     atualizarContadores();
     desenharLista();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
- 
+
   function novoFormulario() {
     form.reset();
     idEmEdicao = null;
@@ -311,11 +318,11 @@
     atualizarContadores();
     desenharLista();
   }
- 
+
   document.getElementById('btnNovo').addEventListener('click', novoFormulario);
   document.getElementById('btnAtualizar').addEventListener('click', carregarIncompletos);
- 
-  //  SALVAR COMO INCOMPLETO 
+
+  // ===== SALVAR COMO INCOMPLETO =====
   document.getElementById('btnIncompleto').addEventListener('click', async function () {
     const dados = lerCampos();
     if (!dados.area && !dados.problema) {
@@ -334,8 +341,8 @@
     }
     this.disabled = false;
   });
- 
-  //  CONCLUIR FORMULÁRIO 
+
+  // ===== CONCLUIR FORMULÁRIO =====
   form.addEventListener('submit', async function (e) {
     e.preventDefault(); // o navegador já validou os campos obrigatórios
     const botao = document.getElementById('btnConcluir');
@@ -351,13 +358,12 @@
     }
     botao.disabled = false;
   });
- 
+
   atualizarContadores();
   carregarIncompletos();
 </script>
 </body>
 </html>
-
 
 
 
