@@ -273,11 +273,15 @@
     const lista = document.getElementById('listaFormularios');
     lista.innerHTML = '<p class="vazio">Carregando...</p>';
     try {
-      
       const res = await chamarFluxo({ acao: 'listar' }, URL_LISTAR); 
       
+      const dadosBrutos = res.value || res.itens || res; 
       
-      todosOsItens = res.value || res.itens || res; 
+      todosOsItens = dadosBrutos.filter(item => {
+        const temProblema = item.problema || item.Problema;
+        const temArea = item.area || item.Area;
+        return (temProblema && String(temProblema).trim() !== '') || (temArea && String(temArea).trim() !== '');
+      });
       
       desenharLista();
     } catch (erro) {
