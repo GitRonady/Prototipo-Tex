@@ -21,17 +21,36 @@
     body { margin: 0; padding: 14px; background: var(--fundo); font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto); }
     svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-    .layout { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 16px; align-items: start; max-width: 1400px; margin: 0 auto; }
+    .layout { 
+      display: grid; 
+      grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); 
+      gap: 16px; 
+      align-items: start; 
+      max-width: 1400px; 
+      margin: 0 auto; 
+      height: calc(100vh - 28px);
+    }
     @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
-    .painel { background: #fff; border: 1px solid var(--borda); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(24,29,62,.08); }
+    .painel { 
+      background: #fff; 
+      border: 1px solid var(--borda); 
+      border-radius: 4px; 
+      overflow: hidden; 
+      box-shadow: 0 1px 3px rgba(24,29,62,.08); 
+      display: flex;         
+      flex-direction: column;
+    }    
     .cabecalho { background: var(--azul); color: #fff; padding: 22px 36px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .cabecalho h1 { margin: 0; font-size: 34px; position: relative; padding-bottom: 8px; }
     .cabecalho h1::after { content: ""; position: absolute; left: 0; bottom: 0; width: 85px; height: 3px; background: var(--vermelho); }
     .cabecalho.lista { padding: 16px 22px; }
     .cabecalho.lista h2 { margin: 0; font-size: 21px; display: flex; align-items: center; gap: 10px; }
     .cabecalho.lista h2 .ic { font-size: 28px; }
-    .corpo { padding: 18px; }
+    .corpo { 
+      padding: 18px; 
+      overflow-y: auto;
+    }
 
     /* formulário */
     .caixa { border: 1px solid var(--borda); border-radius: 6px; padding: 20px 20px 16px; }
