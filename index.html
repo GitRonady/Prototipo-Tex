@@ -351,32 +351,46 @@
     document.getElementById('idForm').textContent = idEmEdicao ? String(idEmEdicao) : '(novo)';
   }
 
-  function abrirFormulario(item) {
-    form.reset();
+    function abrirFormulario(item) {
+   
+      form.reset();
+      
     
-    const preencher = (nomeCampo, valor) => {
-        if (valor) form.elements[nomeCampo].value = valor;
-    };
-
-    preencher('area', item.Area || item.area);
-    preencher('problema', item.Problema || item.problema);
-    preencher('causa', item.Causa || item.causa);
-    preencher('plano', item.Plano || item.plano || item['Plano de ação']);
-    preencher('responsavel', item.Responsavel || item.responsavel);
-    preencher('status', item.Status || item.status);
-    preencher('comentario', item.Comentario || item.comentario);
-    
-    const prazo = item.Prazo || item.prazo;
-    if (prazo) form.elements.prazo.value = String(prazo).slice(0, 10);
-    
-    const dataConclusao = item.DataConclusao || item.dataConclusao || item['Data de Conclusão'];
-    if (dataConclusao) form.elements.dataConclusao.value = String(dataConclusao).slice(0, 10);
-
-    idEmEdicao = item.ID || item.id || item.Id;
-    mostrarId();
-    atualizarContadores();
-    desenharLista();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      const pegarValor = (nomes) => {
+        for (let nome of nomes) {
+          if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
+            return item[nome];
+          }
+        }
+        return '';
+      };
+  
+     
+      form.elements['area'].value = pegarValor(['Area', 'area', 'Área']);
+      form.elements['problema'].value = pegarValor(['Problema', 'problema']);
+      form.elements['causa'].value = pegarValor(['Causa', 'causa']);
+      form.elements['plano'].value = pegarValor(['Plano', 'plano', 'Plano de ação']);
+      form.elements['responsavel'].value = pegarValor(['Responsavel', 'responsavel']);
+      form.elements['status'].value = pegarValor(['Status', 'status']) || 'Aberto';
+      form.elements['comentario'].value = pegarValor(['Comentario', 'comentario']);
+      
+      
+      const prazo = pegarValor(['Prazo', 'prazo']);
+      if (prazo) form.elements['prazo'].value = String(prazo).slice(0, 10);
+      
+      const dataConclusao = pegarValor(['DataConclusao', 'dataConclusao', 'Data de Conclusão']);
+      if (dataConclusao) form.elements['dataConclusao'].value = String(dataConclusao).slice(0, 10);
+  
+      
+      idEmEdicao = pegarValor(['ID', 'id', 'Id']);
+      
+      
+      mostrarId();
+      atualizarContadores();
+      desenharLista();
+      
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function novoFormulario() {
