@@ -28,8 +28,8 @@
       grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
       gap: 16px;
       align-items: start;
-      max-width: 1400px;
-      margin: 0 auto;
+      max-width: none;
+      margin: 0;
       height: calc(100vh - 28px);
     }
     @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
@@ -116,17 +116,17 @@
     select.preenchido, input[type="date"].preenchido { pointer-events: none; }
     .aviso-edicao .btn-liberar { background: none; border: none; color: var(--azul); text-decoration: underline; font-size: 14px; padding: 0 0 0 8px; }
     .aviso-edicao button[hidden] { display: none; }
-    /* Tela menor: reduz tamanhos de letras, espaços, campos e botões */
+    
     body { padding: 8px; }
     .layout { gap: 12px; height: calc(100vh - 16px); }
     @media (min-width: 901px) {
-      .layout { grid-template-columns: minmax(0, 700px) minmax(0, 340px); justify-content: center; }
+      .layout { grid-template-columns: minmax(0, 700px) minmax(0, 340px); justify-content: space-between; }
     }
     @media (max-width: 900px) {
       .layout { height: auto; }
     }
 
-    /* títulos e faixas azuis */
+    
     .cabecalho { padding: 12px 22px 10px; }
     .cabecalho h1 { font-size: 24px; padding-bottom: 6px; }
     .cabecalho h1::after { width: 60px; height: 2px; }
@@ -136,7 +136,7 @@
     .b-atualizar { font-size: 12px; }
     .corpo { padding: 12px; }
 
-    /* formulário */
+    
     .caixa { padding: 14px 14px 10px; }
     .topo { margin-bottom: 10px; }
     .topo h2 { font-size: 18px; gap: 10px; }
@@ -155,7 +155,7 @@
     button { font-size: 13px; padding: 7px 12px; gap: 6px; }
     .aviso-edicao { padding: 7px 10px; font-size: 13px; margin-bottom: 10px; }
 
-    /* lista da direita */
+    
     .info { padding: 8px 12px; font-size: 13px; gap: 8px; margin-bottom: 10px; }
     .info .ic { font-size: 18px; }
     .filtros { margin-bottom: 10px; }
@@ -526,8 +526,8 @@
       const campo = form.elements[nome];
       if (campo.value.trim() !== '') {
         campo.classList.add('preenchido');
-        if (campo.tagName !== 'SELECT') campo.readOnly = true;   // readOnly ainda envia o valor (disabled não enviaria)
-        campo.tabIndex = -1;                                      // o Tab pula os campos travados
+        if (campo.tagName !== 'SELECT') campo.readOnly = true;   
+        campo.tabIndex = -1;                                      
         travados++;
       }
     });
@@ -552,16 +552,15 @@
   function focarOndeParou() {
     limparAvisoEdicao();
 
-    // 1) marca em laranja os campos obrigatórios que ainda estão vazios
+    
     const faltando = OBRIGATORIOS.filter(nome => form.elements[nome].value.trim() === '');
     faltando.forEach(nome => form.elements[nome].classList.add('faltando'));
 
-    // 2) o primeiro campo vazio (na ordem da tela) é onde a pessoa parou.
-    //    Se estiver tudo preenchido, vai para o comentário de acompanhamento
+   
     const primeiroVazio = ORDEM_CAMPOS.find(nome => form.elements[nome].value.trim() === '');
     const alvo = form.elements[primeiroVazio || 'comentario'];
 
-    // 3) mostra a faixa amarela com o ID
+   
     const aviso = document.getElementById('avisoEdicao');
     document.getElementById('textoAvisoEdicao').textContent = faltando.length > 0
       ? 'Continuando o formulário ID ' + idFormulario + '. Os campos já preenchidos estão travados. Complete os campos destacados em laranja.'
@@ -571,7 +570,7 @@
     const travados = travarPreenchidos();
     document.getElementById('btnLiberar').hidden = travados === 0;
 
-    // 4) rola a tela até o campo e coloca o cursor nele
+    
     alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
     alvo.focus({ preventScroll: true });
   }
