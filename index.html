@@ -579,45 +579,54 @@
     document.getElementById('idForm').textContent = idFormulario;
   }
 
-  function abrirFormulario(item) {
-
+    function abrirFormulario(item) {
     form.reset();
 
-
+    
     const pegarValor = (nomes) => {
+      
       for (let nome of nomes) {
         if (item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== '') {
           return item[nome];
         }
       }
+      
+      const chaves = Object.keys(item);
+      for (let chave of chaves) {
+        if (nomes.some(nome => chave.toLowerCase().includes(nome.toLowerCase()))) {
+          if (item[chave] !== undefined && item[chave] !== null && String(item[chave]).trim() !== '') {
+            return item[chave];
+          }
+        }
+      }
       return '';
     };
 
-
-    form.elements['area'].value = pegarValor(['Area', 'area', 'Área']);
+   
+    form.elements['area'].value = pegarValor(['Area', 'area', 'Área', 'área']);
     form.elements['problema'].value = pegarValor(['Problema', 'problema']);
-    form.elements['causa'].value = pegarValor(['Causa', 'causa']);
-    form.elements['plano'].value = pegarValor(['Plano', 'plano', 'Plano de ação']);
-    form.elements['responsavel'].value = pegarValor(['Responsavel', 'responsavel']);
+    form.elements['causa'].value = pegarValor(['Causa', 'causa', 'Causa Raiz']);
+    form.elements['plano'].value = pegarValor(['Plano', 'plano', 'Plano de ação', 'Plano de acao']);
+    form.elements['responsavel'].value = pegarValor(['Responsavel', 'responsavel', 'Responsável']);
     form.elements['status'].value = pegarValor(['Status', 'status']) || 'Aberto';
-    form.elements['comentario'].value = pegarValor(['Comentario', 'comentario']);
+    form.elements['comentario'].value = pegarValor(['Comentario', 'comentario', 'Comentário']);
 
-
-    const prazo = pegarValor(['Prazo', 'prazo']);
+    const prazo = pegarValor(['Prazo', 'prazo', 'Prazo Previsto']);
     if (prazo) form.elements['prazo'].value = String(prazo).slice(0, 10);
 
     const dataConclusao = pegarValor(['DataConclusao', 'dataConclusao', 'Data de Conclusão']);
     if (dataConclusao) form.elements['dataConclusao'].value = String(dataConclusao).slice(0, 10);
 
-
+    
     idEmEdicao = pegarValor(['ID', 'id', 'Id']);
-    idFormulario = lerIdFormulario(item) || gerarIdFormulario();
-
+    idFormulario = lerIdFormulario(item) || (idEmEdicao ? String(idEmEdicao) : gerarIdFormulario());
+    
+    
+    salvarIdStorage(idFormulario);
 
     mostrarId();
     atualizarContadores();
     desenharLista();
-
 
     focarOndeParou();
   }
