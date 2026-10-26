@@ -114,6 +114,14 @@
 
     input.preenchido, select.preenchido, textarea.preenchido { background: #eef5ef; border-color: #b7d7bf; color: #4a5a50; }
     select.preenchido, input[type="date"].preenchido { pointer-events: none; }
+    .bloqueado {
+      background-color: #e9ecef !important;
+      color: #6c757d !important;
+      border-color: #ced4da !important;
+      pointer-events: none;
+      cursor: not-allowed;
+      box-shadow: none !important;
+    }
     .aviso-edicao .btn-liberar { background: none; border: none; color: var(--azul); text-decoration: underline; font-size: 14px; padding: 0 0 0 8px; }
     .aviso-edicao button[hidden] { display: none; }
     
@@ -520,57 +528,43 @@
 
   const CAMPOS_TRAVAVEIS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao'];
 
-  function travarPreenchidos() {
-    let travados = 0;
-    CAMPOS_TRAVAVEIS.forEach(nome => {
+  function aplicarRegrasDeBloqueio() {
+    ['area', 'problema'].forEach(nome => {
       const campo = form.elements[nome];
       if (campo.value.trim() !== '') {
-        campo.classList.add('preenchido');
-        if (campo.tagName !== 'SELECT') campo.readOnly = true;   
-        campo.tabIndex = -1;                                      
-        travados++;
+        campo.classList.add('bloqueado');
+        if (campo.tagName !== 'SELECT') campo.readOnly = true;
+        campo.tabIndex = -1; 
+      } else {
+        campo.classList.remove('bloqueado');
+        if (campo.tagName !== 'SELECT') campo.readOnly = false;
+        campo.removeAttribute('tabindex');
       }
     });
-    return travados;
-  }
 
-  function destravarCampos() {
-    CAMPOS_TRAVAVEIS.forEach(nome => {
+    ['causa', 'plano', 'responsavel'].forEach(nome => {
       const campo = form.elements[nome];
-      campo.classList.remove('preenchido');
-      campo.readOnly = false;
-      campo.removeAttribute('tabindex');
+      if (campo.value.trim() === '') {
+        campo.classList.add('faltando');
+      } else {
+        campo.classList.remove('faltando');
+      }
     });
-  }
-
-  function limparAvisoEdicao() {
-    form.querySelectorAll('.faltando').forEach(c => c.classList.remove('faltando'));
-    destravarCampos();
-    document.getElementById('avisoEdicao').hidden = true;
   }
 
   function focarOndeParou() {
     limparAvisoEdicao();
+    aplicarRegrasDeBloqueio(); 
 
-    
-    const faltando = OBRIGATORIOS.filter(nome => form.elements[nome].value.trim() === '');
-    faltando.forEach(nome => form.elements[nome].classList.add('faltando'));
-
-   
     const primeiroVazio = ORDEM_CAMPOS.find(nome => form.elements[nome].value.trim() === '');
     const alvo = form.elements[primeiroVazio || 'comentario'];
 
-   
     const aviso = document.getElementById('avisoEdicao');
-    document.getElementById('textoAvisoEdicao').textContent = faltando.length > 0
-      ? 'Continuando o formulário ID ' + idFormulario + '. Os campos já preenchidos estão travados. Complete os campos destacados em laranja.'
-      : 'Editando o formulário ID ' + idFormulario + '. Todos os campos obrigatórios já estão preenchidos.';
+    document.getElementById('textoAvisoEdicao').textContent = 'Continuando o formulário ID ' + idFormulario + '. Os campos em cinza estão bloqueados. Os campos em amarelo precisam ser preenchidos.';
     aviso.hidden = false;
-
-    const travados = travarPreenchidos();
-    document.getElementById('btnLiberar').hidden = travados === 0;
-
     
+    document.getElementById('btnLiberar').hidden = true;
+
     alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
     alvo.focus({ preventScroll: true });
   }
@@ -633,9 +627,17 @@
 
   function novoFormulario() {
     form.reset();
+    
+    form.querySelectorAll('.bloqueado, .faltando').forEach(c => {
+      c.classList.remove('bloqueado', 'faltando');
+      if (c.tagName !== 'SELECT') c.readOnly = false;
+      c.removeAttribute('tabindex');
+    });
+    
     limparAvisoEdicao();
     idEmEdicao = null;
     idFormulario = gerarIdFormulario();
+    salvarIdStorage(idFormulario);
     mostrarId();
     atualizarContadores();
     desenharLista();
@@ -659,7 +661,8 @@
     try {
       await chamarFluxo({ ...dados, acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, idFormulario: idFormulario, situacao: 'Pendente' }, URL_SALVAR);
       alert('Formulário salvo como incompleto.');
-      novoFormulario();
+      aplicarRegrasDeBloqueio();
+      
       carregarFormularios();
     } catch (erro) {
       console.error(erro);
@@ -667,7 +670,6 @@
     }
     this.disabled = false;
   });
-
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     const botao = document.getElementById('btnConcluir');
@@ -675,7 +677,8 @@
     try {
       await chamarFluxo({ ...lerCampos(), acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, idFormulario: idFormulario, situacao: 'Finalizado' }, URL_SALVAR);
       alert('Plano de ação salvo com sucesso!');
-      novoFormulario();
+      aplicarRegrasDeBloqueio();
+      
       carregarFormularios();
     } catch (erro) {
       console.error('Erro:', erro);
