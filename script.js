@@ -13,7 +13,7 @@ let paginaAtual = 1;
 
 let idFormulario = '';
 
-// ===== Formulários concluídos =====
+
 const CAMPOS_FIXOS_CONCLUIDO = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo'];
 let formularioConcluido = false;
 let dadosOriginais = null;
@@ -229,7 +229,7 @@ const OBRIGATORIOS = ['area', 'problema', 'causa', 'plano', 'responsavel'];
 
 const CAMPOS_TRAVAVEIS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao'];
 
-// ----- Funções de apoio (avisos, storage, bloqueios) -----
+
 function limparAvisoEdicao() {
   document.getElementById('avisoEdicao').hidden = true;
   document.getElementById('textoAvisoEdicao').textContent = '';
@@ -252,13 +252,13 @@ function limparBloqueios() {
 }
 
 function destravarCampos() {
-  if (formularioConcluido) return; // concluído nunca destrava
+  if (formularioConcluido) return; 
   limparBloqueios();
 }
 
 function aplicarBloqueioConcluido() {
   formularioConcluido = true;
-  dadosOriginais = lerCampos(); // guarda os dados originais
+  dadosOriginais = lerCampos(); 
 
   CAMPOS_FIXOS_CONCLUIDO.forEach(nome => {
     const campo = form.elements[nome];
@@ -268,7 +268,7 @@ function aplicarBloqueioConcluido() {
     campo.tabIndex = -1;
   });
 
-  // Um concluído não volta a ser "incompleto"
+ 
   document.getElementById('btnIncompleto').style.display = 'none';
   document.getElementById('btnConcluir').lastChild.textContent = ' Salvar alterações';
 
@@ -446,3 +446,73 @@ idFormulario = gerarIdFormulario();
 mostrarId();
 atualizarContadores();
 carregarFormularios();
+
+const URL_VALIDAR_USUARIO = 'COLE_AQUI_A_URL_DO_SEU_FLUXO';
+
+
+const DOMINIO_PERMITIDO = '@suaempresa.com.br';
+
+const telaLogin  = document.getElementById('telaLogin');
+const formLogin  = document.getElementById('formLogin');
+const loginEmail = document.getElementById('loginEmail');
+const loginErro  = document.getElementById('loginErro');
+
+
+const usuarioSalvo = sessionStorage.getItem('usuarioAutenticado');
+if (usuarioSalvo) {
+  liberarAcesso(usuarioSalvo);
+}
+
+formLogin.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = loginEmail.value.trim().toLowerCase();
+
+ 
+  if (!email.endsWith(DOMINIO_PERMITIDO)) {
+    mostrarErroLogin('Use seu e-mail corporativo ' + DOMINIO_PERMITIDO);
+    return;
+  }
+
+  const botao = formLogin.querySelector('button');
+  const textoOriginal = botao.innerHTML;
+  botao.disabled = true;
+  botao.textContent = 'Verificando...';
+  loginErro.hidden = true;
+
+  try {
+    const resp = await fetch(URL_VALIDAR_USUARIO, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+    const dados = await resp.json();
+
+    if (dados.valido) {
+      sessionStorage.setItem('usuarioAutenticado', dados.nome || email);
+      liberarAcesso(dados.nome || email);
+    } else {
+      mostrarErroLogin(dados.mensagem || 'E-mail não encontrado ou conta inativa.');
+    }
+  } catch (err) {
+    console.error('Erro na validação:', err);
+    mostrarErroLogin('Erro ao verificar o e-mail. Tente novamente em instantes.');
+  } finally {
+    botao.disabled = false;
+    botao.innerHTML = textoOriginal;
+  }
+});
+
+function liberarAcesso(nomeUsuario) {
+  telaLogin.hidden = true;
+  console.log('✅ Acesso liberado para:', nomeUsuario);
+ 
+}
+
+function mostrarErroLogin(msg) {
+  loginErro.textContent = msg;
+  loginErro.hidden = false;
+}
