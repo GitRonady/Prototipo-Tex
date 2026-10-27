@@ -255,13 +255,50 @@ const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment
     alvo.focus({ preventScroll: true });
   }
 
+const CAMPOS_FIXOS_CONCLUIDO = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo'];
+let formularioConcluido = false;
+let dadosOriginais = null;
+
+function limparBloqueios() {
+  form.querySelectorAll('.bloqueado, .faltando').forEach(c => {
+    c.classList.remove('bloqueado', 'faltando');
+    if (c.tagName !== 'SELECT') c.readOnly = false;
+    c.removeAttribute('tabindex');
+  });
+  formularioConcluido = false;
+  dadosOriginais = null;
+  document.getElementById('btnIncompleto').style.display = '';
+  document.getElementById('btnConcluir').lastChild.textContent = ' Concluir formulário';
+}
+
+function aplicarBloqueioConcluido() {
+  formularioConcluido = true;
+  dadosOriginais = lerCampos(); 
+
+  CAMPOS_FIXOS_CONCLUIDO.forEach(nome => {
+    const campo = form.elements[nome];
+    campo.classList.remove('faltando');
+    campo.classList.add('bloqueado');
+    if (campo.tagName !== 'SELECT') campo.readOnly = true;
+    campo.tabIndex = -1;
+  });
+
+  
+  document.getElementById('btnIncompleto').style.display = 'none';
+  document.getElementById('btnConcluir').lastChild.textContent = ' Salvar alterações';
+
+  document.getElementById('textoAvisoEdicao').textContent =
+    'Formulário ID ' + idFormulario + ' concluído. Somente Status, Data de conclusão e Comentário podem ser alterados.';
+  document.getElementById('avisoEdicao').hidden = false;
+  document.getElementById('btnLiberar').hidden = true;
+}
   function mostrarId() {
     document.getElementById('idForm').textContent = idFormulario;
   }
 
     function abrirFormulario(item) {
     form.reset();
-
+    limparBloqueios();
     
     const pegarValor = (nomes) => {
       
@@ -308,16 +345,18 @@ const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment
     atualizarContadores();
     desenharLista();
 
-    focarOndeParou();
+    const situacao = String(pegarValor(['Situacao', 'situacao'])).toLowerCase();
+    if (situacao === 'finalizado') {
+      aplicarBloqueioConcluido();
+    } else {
+      focarOndeParou();
+    }
   }
 
   function novoFormulario() {
     form.reset();
     
-    form.querySelectorAll('.bloqueado, .faltando').forEach(c => {
-      c.classList.remove('bloqueado', 'faltando');
-      if (c.tagName !== 'SELECT') c.readOnly = false;
-      c.removeAttribute('tabindex');
+    limparBloqueios();
     });
     
     limparAvisoEdicao();
@@ -362,8 +401,18 @@ const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment
     botao.disabled = true;
     try {
       await chamarFluxo({ ...lerCampos(), acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, idFormulario: idFormulario, situacao: 'Finalizado' }, URL_SALVAR);
-      alert('Plano de ação salvo com sucesso!');
-      aplicarRegrasDeBloqueio();
+      const dados = formularioConcluido
+  ? {
+      ...dadosOriginais,                            
+      status: form.elements['status'].value,        
+      dataConclusao: form.elements['dataConclusao'].value,
+      comentario: form.elements['comentario'].value
+    }
+  : lerCampos();
+
+await chamarFluxo({ ...dados, acao: idEmEdicao ? 'atualizar' : 'criar', id: idEmEdicao, idFormulario: idFormulario, situacao: 'Finalizado' }, URL_SALVAR);
+alert(formularioConcluido ? 'Alterações salvas com sucesso!' : 'Plano de ação salvo com sucesso!');
+if (!formularioConcluido) aplicarRegrasDeBloqueio();
       
       carregarFormularios();
     } catch (erro) {
