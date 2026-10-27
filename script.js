@@ -14,7 +14,7 @@ let paginaAtual = 1;
 let idFormulario = '';
 
 
-const CAMPOS_FIXOS_CONCLUIDO = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo'];
+const CAMPOS_FIXOS_CONCLUIDO = ['area', 'problema', 'causa', 'plano', 'responsavel', 'regional', 'prazo'];
 let formularioConcluido = false;
 let dadosOriginais = null;
 
@@ -141,6 +141,7 @@ function desenharLista() {
     const statusItem = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
     const problemaItem = pegarValor(item, ['Problema', 'problema']) || 'Sem problema descrito';
     const areaItem = pegarValor(item, ['Area', 'area', 'Área', 'área']) || 'não definida';
+    const regionalItem = pegarValor(item, ['Regional', 'regional']) || '';
 
     const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
 
@@ -152,7 +153,7 @@ function desenharLista() {
     info.append(
       badge,
       criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
-      criar('p', '', 'Área: ' + areaItem + '  •  ID: ' + (lerIdFormulario(item) || idItem))
+      criar('p', '', 'Área: ' + areaItem + (regionalItem ? '  •  Regional: ' + regionalItem : '') + '  •  ID: ' + (lerIdFormulario(item) || idItem))
     );
 
     const data = formatarData(pegarValor(item, ['criadoEm', 'CriadoEm', 'Data']));
@@ -224,10 +225,10 @@ function gerarIdFormulario() {
   return id;
 }
 
-const ORDEM_CAMPOS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao', 'comentario'];
-const OBRIGATORIOS = ['area', 'problema', 'causa', 'plano', 'responsavel'];
+const ORDEM_CAMPOS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'regional', 'prazo', 'dataConclusao', 'comentario'];
+const OBRIGATORIOS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'regional'];
 
-const CAMPOS_TRAVAVEIS = ['area', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao'];
+const CAMPOS_TRAVAVEIS = ['area', 'regional', 'problema', 'causa', 'plano', 'responsavel', 'prazo', 'dataConclusao'];
 
 
 function limparAvisoEdicao() {
@@ -279,7 +280,7 @@ function aplicarBloqueioConcluido() {
 }
 
 function aplicarRegrasDeBloqueio() {
-  ['area', 'problema'].forEach(nome => {
+  ['area', 'regional', 'problema'].forEach(nome => {
     const campo = form.elements[nome];
     if (campo.value.trim() !== '') {
       campo.classList.add('bloqueado');
@@ -346,6 +347,7 @@ function abrirFormulario(item) {
   };
 
   form.elements['area'].value = pegarValor(['Area', 'area', 'Área', 'área']);
+  form.elements['regional'].value = pegarValor(['Regional', 'regional']);
   form.elements['problema'].value = pegarValor(['Problema', 'problema']);
   form.elements['causa'].value = pegarValor(['Causa', 'causa', 'Causa Raiz']);
   form.elements['plano'].value = pegarValor(['Plano', 'plano', 'Plano de ação', 'Plano de acao']);
