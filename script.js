@@ -447,10 +447,10 @@ mostrarId();
 atualizarContadores();
 carregarFormularios();
 
-const URL_VALIDAR_USUARIO = 'COLE_AQUI_A_URL_DO_SEU_FLUXO';
+const URL_VALIDAR_USUARIO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/b299d152bc6b4bc2a1865e21ab01b5fb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5z2scHhFAcu_y4_t8jARTGu4cZNyH5dqPuiR_oV69XQ';
 
 
-const DOMINIO_PERMITIDO = '@suaempresa.com.br';
+const DOMINIO_PERMITIDO = '@totalexpress.com.br';
 
 const telaLogin  = document.getElementById('telaLogin');
 const formLogin  = document.getElementById('formLogin');
@@ -519,70 +519,3 @@ function mostrarErroLogin(msg) {
 
 
 
-const URL_VALIDAR_USUARIO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/b299d152bc6b4bc2a1865e21ab01b5fb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5z2scHhFAcu_y4_t8jARTGu4cZNyH5dqPuiR_oV69XQ';
-
-
-const DOMINIO_PERMITIDO = '@totalexpress.com.br';
-
-const telaLogin = document.getElementById('telaLogin');
-const formLogin = document.getElementById('formLogin');
-const loginEmail = document.getElementById('loginEmail');
-const loginErro = document.getElementById('loginErro');
-
-
-if (sessionStorage.getItem('usuarioLogado')) {
-  telaLogin.classList.add('escondido'); 
-}
-
-
-formLogin.addEventListener('submit', async (e) => {
-  e.preventDefault(); 
-  
-  const email = loginEmail.value.trim().toLowerCase();
-
- 
-  if (!email.endsWith(DOMINIO_PERMITIDO)) {
-    mostrarErroLogin('Use seu e-mail corporativo ' + DOMINIO_PERMITIDO);
-    return;
-  }
-
-  
-  const botao = formLogin.querySelector('button');
-  botao.disabled = true;
-  botao.textContent = 'Verificando...';
-  loginErro.hidden = true;
-
-  try {
-  
-    const resposta = await fetch(URL_VALIDAR_USUARIO, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email })
-    });
-
-    const dados = await resposta.json();
-
-
-    if (dados.valido) {
-
-      sessionStorage.setItem('usuarioLogado', email);
-      telaLogin.classList.add('escondido');
-    } else {
-    
-      mostrarErroLogin(dados.mensagem || 'E-mail não autorizado.');
-    }
-  } catch (erro) {
-    console.error('Erro na validação:', erro);
-    mostrarErroLogin('Erro de conexão. Tente novamente.');
-  } finally {
-  
-    botao.disabled = false;
-    botao.textContent = 'Entrar';
-  }
-});
-
-
-function mostrarErroLogin(mensagem) {
-  loginErro.textContent = mensagem;
-  loginErro.hidden = false;
-}
