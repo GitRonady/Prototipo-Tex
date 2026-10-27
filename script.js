@@ -499,7 +499,7 @@ formLogin.addEventListener('submit', async (e) => {
     }
   } catch (err) {
     console.error('Erro na validação:', err);
-    mostrarErroLogin('Erro ao verificar o e-mail. Tente novamente em instantes.');
+    mostrarErroLogin('E-mail não encontrado ou conta inativa.');
   } finally {
     botao.disabled = false;
     botao.innerHTML = textoOriginal;
