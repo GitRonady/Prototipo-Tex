@@ -7,50 +7,32 @@
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
+  <body>
   
-<div id="telaLogin" class="login-overlay">
-  <div class="login-card">
-    <div class="login-cabecalho">
-      <h1>Plano de Ação</h1>
-      <p>informe seu e-mail corporativo</p>
+  <div id="telaLogin" class="login-overlay">
+    <div class="login-card">
+      <div class="login-cabecalho">
+        <h1>Plano de Ação</h1>
+        <p>informe seu e-mail</p>
+      </div>
+      <form id="formLogin" class="login-form">
+        <label for="loginEmail">E-mail corporativo</label>
+        <input type="email" id="loginEmail" name="email"
+               placeholder="nome@empresa.com.br"
+               autocomplete="email" required>
+        <p id="loginErro" class="login-erro" hidden></p>
+        <button type="submit" class="b-vermelho login-btn">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" x2="3" y1="12" y2="12"/>
+          </svg>
+          Entrar
+        </button>
+      </form>
     </div>
-    <form id="formLogin" class="login-form">
-      <label for="loginEmail">E-mail corporativo</label>
-      <input type="email" id="loginEmail" name="email"
-             placeholder="nome@empresa.com.br"
-             autocomplete="email" required>
-      <p id="loginErro" class="login-erro" hidden></p>
-      <button type="submit" class="b-vermelho login-btn">
-        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-          <polyline points="10 17 15 12 10 7"/>
-          <line x1="15" x2="3" y1="12" y2="12"/>
-        </svg>
-        Entrar
-      </button>
-    </form>
-    <p class="login-rodape">
-    </p>
   </div>
-</div>
-
-<div id="telaLogin" class="login-overlay">
-  <div class="login-card">
-    <div class="login-cabecalho">
-      <h1>Plano de Ação</h1>
-      <p>informe seu e-mail</p>
-    </div>
-    
-    <form id="formLogin" class="login-form">
-      <label for="loginEmail">E-mail corporativo</label>
-      <input type="email" id="loginEmail" placeholder="nome@empresa.com.br" required>
-      
-      <p id="loginErro" class="login-erro" hidden></p>
-      
-      <button type="submit" class="b-vermelho login-btn">Entrar</button>
-    </form>
-  </div>
-</div>
+   
   <div class="layout">
 
     <section class="painel">
