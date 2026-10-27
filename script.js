@@ -517,5 +517,3 @@ function mostrarErroLogin(msg) {
   loginErro.hidden = false;
 }
 
-
-
