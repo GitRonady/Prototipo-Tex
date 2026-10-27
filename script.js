@@ -162,7 +162,23 @@ function desenharLista() {
       linhaData.append(data);
       info.append(linhaData);
     }
-
+    const prazo = pegarValor(item, ['Prazo', 'prazo', 'Prazo Previsto']);
+    if (prazo) {
+      const linhaPrazo = criar('p', 'data');
+      linhaPrazo.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
+      const dataFormatada = new Date(prazo).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+      linhaPrazo.append('Prazo: ' + dataFormatada);
+      info.append(linhaPrazo);
+    }
+    
+    const dataConclusao = pegarValor(item, ['DataConclusao', 'dataConclusao', 'Data de Conclusão']);
+    if (dataConclusao) {
+      const linhaConclusao = criar('p', 'data');
+      linhaConclusao.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
+      const dataFormatada = new Date(dataConclusao).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+      linhaConclusao.append('Concluído em: ' + dataFormatada);
+      info.append(linhaConclusao);
+    }
     const botao = criar('button', 'b-azul', isFinalizado ? 'Visualizar' : 'Continuar');
     botao.type = 'button';
     botao.addEventListener('click', () => abrirFormulario(item));
