@@ -508,10 +508,10 @@ formLogin.addEventListener('submit', async (e) => {
 
 function liberarAcesso(nomeUsuario) {
   telaLogin.hidden = true;
+  telaLogin.style.display = 'none'; 
+  
   console.log('✅ Acesso liberado para:', nomeUsuario);
- 
 }
-
 function mostrarErroLogin(msg) {
   loginErro.textContent = msg;
   loginErro.hidden = false;
