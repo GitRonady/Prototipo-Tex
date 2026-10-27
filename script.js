@@ -356,15 +356,14 @@ function abrirFormulario(item) {
   if (situacao === 'finalizado') {
     aplicarBloqueioConcluido();
   } else {
-    focarOndeParou(); // em andamento: funciona como antes
+    focarOndeParou(); 
   }
 }
 
 function novoFormulario() {
   form.reset();
-
   limparBloqueios();
-
+  
   limparAvisoEdicao();
   idEmEdicao = null;
   idFormulario = gerarIdFormulario();
