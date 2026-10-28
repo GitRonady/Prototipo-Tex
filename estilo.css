@@ -13,21 +13,34 @@
 * { box-sizing: border-box; }
 body { margin: 0; padding: 8px; background: var(--fundo); font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto); }
 svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-
-/* TABELAS LADO A LADO NOS EXTREMOS */
+/* TABELAS LADO A LADO COM ESPAÇO NO MEIO E MAIS FINAS */
 .layout { 
   display: grid; 
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); 
-  gap: 16px; 
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); /* Deixa a esquerda um pouco maior por ter o form */
+  gap: 32px; /* Aumenta consideravelmente o espaço entre as tabelas */
   align-items: start; 
   width: 100%; 
-  max-width: none; 
-  margin: 0; 
-  height: calc(100vh - 16px); 
+  max-width: 1400px; /* Impede que fiquem esticadas demais em telas gigantes */
+  margin: 0 auto; /* Centraliza o bloco todo na tela */
+  padding: 0 16px; /* Respiro nas laterais */
+  height: calc(100vh - 32px); 
 }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; height: auto; } }
 
-.layout.sem-lista { grid-template-columns: 1fr !important; max-width: 700px; margin: 0 auto; }
+@media (max-width: 900px) { 
+  .layout { 
+    grid-template-columns: 1fr; 
+    height: auto; 
+    gap: 16px; /* Em telas menores, diminui um pouco o espaço */
+  } 
+}
+
+/* Quando a lista está oculta, o formulário fica centralizado e fino */
+.layout.sem-lista { 
+  grid-template-columns: minmax(0, 700px) !important; 
+  justify-content: center;
+  max-width: 700px; 
+  margin: 0 auto; 
+}
 
 .painel { background: #fff; border: 1px solid var(--borda); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(24,29,62,.08); display: flex; flex-direction: column; }
 .cabecalho { background: var(--azul); color: #fff; padding: 12px 22px 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
