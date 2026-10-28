@@ -13,36 +13,38 @@
 * { box-sizing: border-box; }
 body { margin: 0; padding: 8px; background: var(--fundo); font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto); }
 svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-/* TABELAS LADO A LADO COM ESPAÇO NO MEIO E MAIS FINAS */
+
+/* TABELAS NOS EXTREMOS COM ESPAÇO GIGANTE NO MEIO */
 .layout { 
   display: grid; 
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); /* Deixa a esquerda um pouco maior por ter o form */
-  gap: 32px; /* Aumenta consideravelmente o espaço entre as tabelas */
+  /* Define a largura máxima de cada painel (esquerda 750px, direita 450px) */
+  grid-template-columns: minmax(0, 750px) minmax(0, 450px); 
+  justify-content: space-between; /* Empurra um para cada canto da tela! */
   align-items: start; 
   width: 100%; 
-  max-width: 1400px; /* Impede que fiquem esticadas demais em telas gigantes */
-  margin: 0 auto; /* Centraliza o bloco todo na tela */
-  padding: 0 16px; /* Respiro nas laterais */
+  max-width: 100%; /* Ocupa a tela inteira para separar bem */
+  margin: 0; 
+  padding: 0 32px; /* Deixa uma margem de 32px nas bordas do monitor */
   height: calc(100vh - 32px); 
+  gap: 0; /* O espaço no meio é gerado automaticamente */
 }
 
 @media (max-width: 900px) { 
   .layout { 
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr; /* Em celulares, empilha um em cima do outro */
+    justify-content: center;
     height: auto; 
-    gap: 16px; /* Em telas menores, diminui um pouco o espaço */
+    gap: 16px; 
+    padding: 0; 
   } 
 }
 
-/* Quando a lista está oculta, o formulário fica centralizado e fino */
+/* Quando a lista está oculta (Nova Ocorrência), o formulário fica centralizado */
 .layout.sem-lista { 
   grid-template-columns: minmax(0, 700px) !important; 
-  justify-content: center;
-  max-width: 700px; 
-  margin: 0 auto; 
-}
-
-.painel { background: #fff; border: 1px solid var(--borda); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(24,29,62,.08); display: flex; flex-direction: column; }
+  justify-content: center; /* Centraliza o form no meio da tela */
+  padding: 0;
+}.painel { background: #fff; border: 1px solid var(--borda); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(24,29,62,.08); display: flex; flex-direction: column; }
 .cabecalho { background: var(--azul); color: #fff; padding: 12px 22px 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cabecalho h1 { margin: 0; font-size: 24px; position: relative; padding-bottom: 6px; }
 .cabecalho h1::after { content: ""; position: absolute; left: 0; bottom: 0; width: 60px; height: 2px; background: var(--vermelho); }
