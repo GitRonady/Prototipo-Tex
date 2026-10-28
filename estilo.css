@@ -39,6 +39,8 @@ label { display: block; font-weight: 700; font-size: 13px; margin: 0 0 3px; }
 label b { color: var(--vermelho); font-weight: 700; }
 input, select, textarea { width: 100%; padding: 6px 9px; border: 1px solid var(--borda); border-radius: 5px; font-family: inherit; font-size: 13px; color: var(--texto); background: #fff; }
 textarea { resize: vertical; min-height: 56px; }
+/* Destaque sutil dos campos obrigatórios (problema, causa, plano) */
+textarea.obrigatorio-suave { border: 1px solid rgba(212, 32, 42, 0.3); }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--destaque); border-color: var(--destaque); }
 .campo { margin-bottom: 8px; }
 .contador { text-align: right; font-size: 11px; color: var(--suave); margin-top: 2px; }
