@@ -71,8 +71,8 @@ formLogin.addEventListener('submit', async (e) => {
 
     const dados = await resp.json();
 
-       if (dados.valido) {
-      // Salva o E-MAIL digitado, ignorando o nome de exibição
+    if (dados.valido) {
+      // ESSA É A LINHA QUE PRECISA ESTAR ASSIM (usando 'email', não 'dados.nome')
       sessionStorage.setItem('usuarioAutenticado', email); 
       liberarAcesso(email); 
     } else {
