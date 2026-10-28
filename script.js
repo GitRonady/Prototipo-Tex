@@ -241,7 +241,28 @@ document.querySelectorAll('.filtros button').forEach(btn => {
     desenharLista();
   });
 });
+// ================= FILTRO DE PERMISSÃO (camada extra no front) =================
+function normalizarRegional(v) {
+  return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
+}
 
+function lerRegionalItem(item) {
+  for (const chave of Object.keys(item)) {
+    if (chave.toLowerCase() === 'regional') {
+      const v = item[chave];
+      // Colunas de escolha do SharePoint podem vir como objeto { Value: 'SUL' }
+      return (v && typeof v === 'object') ? (v.Value || '') : v;
+    }
+  }
+  return '';
+}
+
+function filtrarPorPermissao(itens) {
+  if (isAdmin) return itens; // Admin vê todas as regionais
+  const minha = normalizarRegional(regionalDoUsuario);
+  if (!minha) return []; // sem regional definida = não mostra nada
+  return itens.filter(i => normalizarRegional(lerRegionalItem(i)) === minha);
+}
 async function carregarFormularios(idParaAbrir = null) {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '<p class="vazio">Carregando...</p>';
@@ -249,7 +270,10 @@ async function carregarFormularios(idParaAbrir = null) {
     // ENVIA O E-MAIL PARA O PA FILTRAR NO SERVIDOR
     const res = await chamarFluxo({ acao: 'listar', emailLogado: emailLogado }, URL_LISTAR);
     const dadosBrutos = res.value || res.itens || res;
-    todosOsItens = dadosBrutos.filter(item => item && (JSON.stringify(item).includes('problema') || JSON.stringify(item).includes('Problema')));
+    const validos = dadosBrutos.filter(item => item && (JSON.stringify(item).includes('problema') || JSON.stringify(item).includes('Problema')));
+
+    // CAMADA EXTRA DE SEGURANÇA: regional só enxerga a própria regional
+    todosOsItens = filtrarPorPermissao(validos);
     todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
 
     if (idParaAbrir) {
@@ -268,7 +292,6 @@ async function carregarFormularios(idParaAbrir = null) {
     lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
   }
 }
-
 function desenharLista() {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '';
@@ -279,9 +302,12 @@ function desenharLista() {
     return null;
   };
 
-  let itensFiltrados = todosOsItens;
-  if (filtroAtual === 'pendente') itensFiltrados = todosOsItens.filter(i => pegarValor(i, ['Situacao', 'situacao', 'Status', 'status']) !== 'Finalizado');
-  else if (filtroAtual === 'finalizado') itensFiltrados = todosOsItens.filter(i => pegarValor(i, ['Situacao', 'situacao', 'Status', 'status']) === 'Finalizado');
+  // Validação visual antes de renderizar (Admin = todas; Regional = só a dela)
+  const base = filtrarPorPermissao(todosOsItens);
+
+  let itensFiltrados = base;
+  if (filtroAtual === 'pendente') itensFiltrados = base.filter(i => pegarValor(i, ['Situacao', 'situacao', 'Status', 'status']) !== 'Finalizado');
+  else if (filtroAtual === 'finalizado') itensFiltrados = base.filter(i => pegarValor(i, ['Situacao', 'situacao', 'Status', 'status']) === 'Finalizado');
 
   if (itensFiltrados.length === 0) {
     lista.innerHTML = '<p class="vazio">Nenhuma ocorrência encontrada.</p>';
@@ -334,7 +360,6 @@ function desenharLista() {
     lista.appendChild(nav);
   }
 }
-
 function formatarData(valor) {
   if (!valor) return '';
   const d = new Date(valor);
