@@ -71,9 +71,10 @@ formLogin.addEventListener('submit', async (e) => {
 
     const dados = await resp.json();
 
-    if (dados.valido) {
-      sessionStorage.setItem('usuarioAutenticado', dados.nome || email);
-      liberarAcesso(dados.nome || email);
+       if (dados.valido) {
+      // Salva o E-MAIL digitado, ignorando o nome de exibição
+      sessionStorage.setItem('usuarioAutenticado', email); 
+      liberarAcesso(email); 
     } else {
       mostrarErroLogin(dados.mensagem || 'E-mail não encontrado ou conta inativa.');
     }
