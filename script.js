@@ -402,10 +402,17 @@ function abrirFormulario(item) {
   form.elements['status'].value = pegarValor(['Status', 'status']) || 'Pendente de preenchimento';
   form.elements['comentario'].value = pegarValor(['Comentario', 'comentario', 'Comentário']);
   
-  const prazo = pegarValor(['Prazo', 'prazo']);
-  if (prazo) form.elements['prazo'].value = String(prazo).slice(0, 10);
-  const dataConc = pegarValor(['DataConclusao', 'dataConclusao']);
-  if (dataConc) form.elements['dataConclusao'].value = String(dataConc).slice(0, 10);
+  const mapaDatas = {
+  dataPrevisaoInicio:    ['DataPrevisaoInicio',    'dataPrevisaoInicio',    'PrevisaoInicio'],
+  dataInicioReal:        ['DataInicioReal',        'dataInicioReal',        'InicioReal'],
+  dataPrevisaoConclusao: ['DataPrevisaoConclusao', 'dataPrevisaoConclusao', 'PrevisaoConclusao', 'Prazo', 'prazo'],
+  dataConclusaoReal:     ['DataConclusaoReal',     'dataConclusaoReal',     'ConclusaoReal',     'DataConclusao', 'dataConclusao']
+};
+
+Object.keys(mapaDatas).forEach(campo => {
+  const valor = pegarValor(mapaDatas[campo]);
+  if (valor) form.elements[campo].value = String(valor).slice(0, 10);
+});
 
   // Muda a tela
   document.getElementById('tituloFormulario').textContent = 'Tratativa da Ocorrência';
@@ -447,7 +454,8 @@ function abrirFormulario(item) {
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   } else if (situacao === 'finalizado' || situacao === 'concluído') {
     // Já foi concluído. Trava tudo.
-    ['regional', 'area', 'problema', 'causa', 'plano', 'responsavel', 'prazo'].forEach(id => {
+    ['regional', 'area', 'problema', 'causa', 'plano', 'responsavel',
+ 'dataPrevisaoInicio', 'dataInicioReal', 'dataPrevisaoConclusao', 'dataConclusaoReal'].forEach(id => {
       const campo = form.elements[id];
       campo.classList.add('bloqueado');
       if (campo.tagName !== 'SELECT') campo.readOnly = true;
