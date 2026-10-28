@@ -82,7 +82,7 @@ formLogin.addEventListener('submit', async (e) => {
     if (err.name === 'AbortError') {
       mostrarErroLogin('O servidor demorou muito para responder. Tente novamente.');
     } else {
-      mostrarErroLogin('Erro de conexão. Verifique sua internet.');
+      mostrarErroLogin('E-mail não corporativo ou conta inativa.');
     }
   } finally {
     clearTimeout(timeoutId);
