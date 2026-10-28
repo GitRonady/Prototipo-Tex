@@ -7,16 +7,14 @@
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-  
-  <!-- TELA DE LOGIN -->
   <div id="telaLogin" class="login-overlay">
     <div class="login-card">
       <div class="login-cabecalho">
         <h1>Gestão de Ocorrências</h1>
-        <p>Informe seu e-mail corporativo</p>
+        <p>Informe seu e-mail </p>
       </div>
       <form id="formLogin" class="login-form">
-        <label for="loginEmail">E-mail corporativo</label>
+        <label for="loginEmail">E-mail </label>
         <input type="email" id="loginEmail" name="email" placeholder="nome@empresa.com.br" autocomplete="email" required>
         <p id="loginErro" class="login-erro" hidden></p>
         <button type="submit" class="b-vermelho login-btn">Entrar</button>
@@ -25,7 +23,6 @@
   </div>
 
   <div class="layout">
-    <!-- COLUNA ESQUERDA: FORMULÁRIO TORRE DE CONTROLE -->
     <section class="painel" id="painelFormulario">
       <div class="cabecalho">
         <h1>Plano de Ação</h1>
@@ -44,7 +41,6 @@
             <span id="textoAvisoEdicao"></span>
           </div>
 
-          <!-- REGIONAL E RESPONSÁVEL NA MESMA LINHA -->
           <div class="linha">
             <div class="campo">
               <label for="regional">Regional<b>*</b></label>
@@ -63,7 +59,6 @@
             </div>
           </div>
 
-          <!-- ÁREA E PRAZO NA MESMA LINHA -->
           <div class="linha">
             <div class="campo">
               <label for="area">Área Responsável<b>*</b></label>
@@ -89,7 +84,6 @@
             <div class="contador"></div>
           </div>
 
-          <!-- CAMPOS EXTRAS -->
           <div id="camposExtras" style="display: none;">
             <div class="campo">
               <label for="causa">Causa Raiz<b>*</b></label>
@@ -151,7 +145,6 @@
       </div>
     </section>
 
-    <!-- COLUNA DIREITA: TABELA DE OCORRÊNCIAS -->
     <section class="painel" id="painelLista" style="display: none;">
       <div class="cabecalho lista">
         <h2>Ocorrências Registradas</h2>
