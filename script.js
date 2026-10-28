@@ -1,4 +1,4 @@
-// ================= VARIÁVEIS GLOBAIS =================
+
 const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
 const URL_LISTAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/3fbf1a2a119441dabcb8c284dcae4cfe/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OdpmDoJPfT2zixNtGYBbnkZJkWrhs2pyVKgk1oPtOUI';
 const URL_VALIDAR_USUARIO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/b299d152bc6b4bc2a1865e21ab01b5fb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5z2scHhFAcu_y4_t8jARTGu4cZNyH5dqPuiR_oV69XQ';
@@ -15,7 +15,6 @@ let paginaAtual = 1;
 let idFormulario = '';
 let isTelaCriacao = true;
 
-// ================= LOGIN =================
 const telaLogin = document.getElementById('telaLogin');
 const formLogin = document.getElementById('formLogin');
 const loginEmail = document.getElementById('loginEmail');
@@ -97,7 +96,6 @@ function mostrarErroLogin(msg) {
   loginErro.hidden = false;
 }
 
-// ================= FUNÇÕES AUXILIARES =================
 async function chamarFluxo(payload, url) {
   const resposta = await fetch(url, {
     method: 'POST',
@@ -147,7 +145,6 @@ function mostrarId() {
   document.getElementById('idForm').textContent = idFormulario;
 }
 
-// ================= CONTROLE DE TELAS =================
 function mostrarTelaCriacao() {
   isTelaCriacao = true;
   form.reset();
@@ -162,15 +159,12 @@ function mostrarTelaCriacao() {
   document.getElementById('tituloFormulario').textContent = 'Nova Ocorrência';
   document.getElementById('camposExtras').style.display = 'none'; 
   
-  // Esconde os campos que só a Área preenche
   document.getElementById('campoResponsavel').style.display = 'none';
   document.getElementById('campoPrazo').style.display = 'none';
   
-  // Layout
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
   
-  // Botões
   document.getElementById('btnVerLista').style.display = 'inline-flex';
   document.getElementById('btnEnviarOcorrencia').style.display = 'inline-flex';
   document.getElementById('btnVoltarLista').style.display = 'none';
@@ -187,7 +181,6 @@ function mostrarTelaLista() {
   document.getElementById('tituloFormulario').textContent = 'Detalhes da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
   
-  // Mostra os campos de Responsável e Prazo que estavam escondidos
   document.getElementById('campoResponsavel').style.display = 'block';
   document.getElementById('campoPrazo').style.display = 'block';
   
@@ -198,7 +191,6 @@ function mostrarTelaLista() {
   carregarFormularios();
 }
 
-// ================= LISTAGEM =================
 document.querySelectorAll('.filtros button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
@@ -308,7 +300,6 @@ function formatarData(valor) {
   return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
 }
 
-// ================= ABRIR E PREENCHER FORMULÁRIO =================
 function abrirFormulario(item) {
   const pegarValor = (nomes) => {
     for (let n of nomes) if (item[n] !== undefined && item[n] !== null && String(item[n]).trim() !== '') return item[n];
@@ -339,7 +330,6 @@ function abrirFormulario(item) {
   document.getElementById('tituloFormulario').textContent = 'Tratativa da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
   
-  // Mostra os campos que foram movidos para cima
   document.getElementById('campoResponsavel').style.display = 'block';
   document.getElementById('campoPrazo').style.display = 'block';
   
@@ -381,7 +371,6 @@ function abrirFormulario(item) {
   document.getElementById('formPlano').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ================= ENVIOS =================
 document.getElementById('btnVerLista').addEventListener('click', mostrarTelaLista);
 document.getElementById('btnVoltarLista').addEventListener('click', mostrarTelaCriacao);
 document.getElementById('btnAtualizar').addEventListener('click', () => carregarFormularios());
