@@ -186,22 +186,27 @@ function normalizarRegional(v) {
   return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
 }
 
+// Retorna a regional do item, ou null se o item não tiver nenhum campo de regional
 function lerRegionalItem(item) {
-  for (const chave of Object.keys(item)) {
-    if (chave.toLowerCase() === 'regional') {
-      const v = item[chave];
-      // Colunas de escolha do SharePoint podem vir como objeto { Value: 'SUL' }
-      return (v && typeof v === 'object') ? (v.Value || '') : v;
-    }
-  }
-  return '';
+  const chaves = Object.keys(item);
+  // Mesma lógica de busca do restante do código: nome exato primeiro, depois nome parecido
+  const chave = chaves.find(c => c.toLowerCase() === 'regional') ||
+                chaves.find(c => c.toLowerCase().includes('regional'));
+  if (!chave) return null;
+  const v = item[chave];
+  // Colunas de escolha do SharePoint podem vir como objeto { Value: 'SUL' }
+  return (v && typeof v === 'object') ? (v.Value || '') : v;
 }
 
 function filtrarPorPermissao(itens) {
   if (isAdmin) return itens; // Admin vê todas as regionais
   const minha = normalizarRegional(regionalDoUsuario);
   if (!minha) return []; // sem regional definida = não mostra nada
-  return itens.filter(i => normalizarRegional(lerRegionalItem(i)) === minha);
+  return itens.filter(i => {
+    const reg = lerRegionalItem(i);
+    if (reg === null) return true; // sem campo regional na resposta: confia no filtro do Power Automate
+    return normalizarRegional(reg) === minha;
+  });
 }
 
 // ================= CONTROLE DE TELAS =================
