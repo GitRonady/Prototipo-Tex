@@ -28,7 +28,7 @@
     <!-- COLUNA ESQUERDA: FORMULÁRIO TORRE DE CONTROLE -->
     <section class="painel" id="painelFormulario">
       <div class="cabecalho">
-        <h1>Torre de Controle</h1>
+        <h1>Plano de Ação</h1>
       </div>
       <div class="corpo">
         <form id="formPlano" class="caixa">
@@ -50,16 +50,15 @@
               <label for="regional">Regional<b>*</b></label>
               <select id="regional" name="regional" required>
                 <option value="">Selecione a Regional</option>
-                <option>Nacional</option>
-                <option>Sudeste</option>
-                <option>Sul</option>
-                <option>Centro-Oeste</option>
-                <option>Nordeste</option>
-                <option>Norte</option>
+                <option>CO/N</option>
+                <option>MG/RJ/ES</option>
+                <option>NE</option>
+                <option>SP</option>
+                <option>SUL</option>
               </select>
             </div>
             <div class="campo" id="campoResponsavel" style="display: none;">
-              <label for="responsavel">Responsável pela Execução<b>*</b></label>
+              <label for="responsavel">Responsável<b>*</b></label>
               <input type="text" id="responsavel" name="responsavel" maxlength="500" placeholder="Nome do responsável">
             </div>
           </div>
@@ -145,7 +144,7 @@
 
             <button type="submit" class="b-vermelho" id="btnConcluir" style="display: none;">
               <svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              Concluir Tratativa
+              Enviar Plano de Ação
             </button>
           </div>
         </form>
@@ -164,8 +163,8 @@
       <div class="corpo">
         <div class="filtros">
           <button type="button" class="ativo" data-filtro="todos">Todos</button>
-          <button type="button" data-filtro="pendente">Pendentes</button>
-          <button type="button" data-filtro="finalizado">Concluídos</button>
+          <button type="button" data-filtro="pendente">Ocorrências Pendentes</button>
+          <button type="button" data-filtro="finalizado">Ocorrências Enviadas</button>
         </div>
         <div id="listaFormularios"><p class="vazio">Carregando...</p></div>
       </div>
