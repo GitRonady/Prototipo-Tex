@@ -205,7 +205,9 @@ async function carregarFormularios(idParaAbrir = null) {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '<p class="vazio">Carregando...</p>';
   try {
-    const res = await chamarFluxo({ acao: 'listar' }, URL_LISTAR);
+    // AQUI ESTÁ A MUDANÇA (envia o emailLogado)
+    const res = await chamarFluxo({ acao: 'listar', emailLogado: emailLogado }, URL_LISTAR);
+    
     const dadosBrutos = res.value || res.itens || res;
     todosOsItens = dadosBrutos.filter(item => item && (JSON.stringify(item).includes('problema') || JSON.stringify(item).includes('Problema')));
     todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
@@ -215,8 +217,13 @@ async function carregarFormularios(idParaAbrir = null) {
       if (item) {
         abrirFormulario(item);
       } else {
-        alert('Ocorrência não encontrada.');
-        mostrarTelaCriacao();
+        alert('Ocorrência não encontrada ou você não tem permissão para visualizá-la.');
+        // Segurança: Se não for admin, não pode ir para a tela de criação
+        if (isAdmin) {
+            mostrarTelaCriacao();
+        } else {
+            mostrarTelaLista();
+        }
       }
     } else {
       desenharLista();
@@ -226,7 +233,6 @@ async function carregarFormularios(idParaAbrir = null) {
     lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
   }
 }
-
 function desenharLista() {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '';
