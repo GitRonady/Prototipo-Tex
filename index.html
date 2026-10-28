@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestão de Ocorrências</title>
+  <title>Gestão de Ocorrências - Torre de Controle</title>
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
+  
+  <!-- TELA DE LOGIN -->
   <div id="telaLogin" class="login-overlay">
     <div class="login-card">
       <div class="login-cabecalho">
-        <h1>Gestão de Ocorrências</h1>
-        <p>Informe seu e-mail </p>
+        <h1>Torre de Controle</h1>
+        <p>Informe seu e-mail</p>
       </div>
       <form id="formLogin" class="login-form">
-        <label for="loginEmail">E-mail </label>
-        <input type="email" id="loginEmail" name="email" placeholder="e-mail@totalexpress.com.br" autocomplete="email" required>
+        <label for="loginEmail">E-mail</label>
+        <input type="email" id="loginEmail" name="email" placeholder="email@totalexpress.com.br" autocomplete="email" required>
         <p id="loginErro" class="login-erro" hidden></p>
         <button type="submit" class="b-vermelho login-btn">Entrar</button>
       </form>
@@ -23,9 +25,10 @@
   </div>
 
   <div class="layout">
+    <!-- COLUNA ESQUERDA: FORMULÁRIO -->
     <section class="painel" id="painelFormulario">
       <div class="cabecalho">
-        <h1>Plano de Ação</h1>
+        <h1>Torre de Controle</h1>
       </div>
       <div class="corpo">
         <form id="formPlano" class="caixa">
@@ -41,25 +44,19 @@
             <span id="textoAvisoEdicao"></span>
           </div>
 
+          <!-- CAMPOS INICIAIS (SEMPRE VISÍVEIS) -->
           <div class="linha">
             <div class="campo">
               <label for="regional">Regional<b>*</b></label>
               <select id="regional" name="regional" required>
                 <option value="">Selecione a Regional</option>
-                <option>CO/N</option>
-                <option>MG/RJ/ES</option>
                 <option>NE</option>
-                <option>SP</option>
+                <option>MG/RJ/ES</option>
                 <option>SUL</option>
+                <option>SP</option>
+                <option>CO/N</option>
               </select>
             </div>
-            <div class="campo" id="campoResponsavel" style="display: none;">
-              <label for="responsavel">Responsável<b>*</b></label>
-              <input type="text" id="responsavel" name="responsavel" maxlength="500" placeholder="Nome do responsável">
-            </div>
-          </div>
-
-          <div class="linha">
             <div class="campo">
               <label for="area">Área Responsável<b>*</b></label>
               <select id="area" name="area" required>
@@ -72,10 +69,6 @@
                 <option>Outras Areas</option>
               </select>
             </div>
-            <div class="campo" id="campoPrazo" style="display: none;">
-              <label for="prazo">Prazo Previsto</label>
-              <input type="date" id="prazo" name="prazo">
-            </div>
           </div>
 
           <div class="campo">
@@ -84,6 +77,7 @@
             <div class="contador"></div>
           </div>
 
+          <!-- CAMPOS EXTRAS (SÓ APARECEM NA TRATATIVA) -->
           <div id="camposExtras" style="display: none;">
             <div class="campo">
               <label for="causa">Causa Raiz<b>*</b></label>
@@ -95,6 +89,17 @@
               <label for="plano">Plano de ação<b>*</b></label>
               <textarea id="plano" name="plano" maxlength="500" placeholder="O que será feito para resolver?"></textarea>
               <div class="contador"></div>
+            </div>
+
+            <div class="linha">
+              <div class="campo">
+                <label for="responsavel">Responsável pela Execução<b>*</b></label>
+                <input type="text" id="responsavel" name="responsavel" maxlength="500" placeholder="Nome do responsável">
+              </div>
+              <div class="campo">
+                <label for="prazo">Prazo Previsto</label>
+                <input type="date" id="prazo" name="prazo">
+              </div>
             </div>
 
             <div class="linha">
@@ -120,6 +125,7 @@
             </div>
           </div>
 
+          <!-- BOTÕES -->
           <div class="botoes">
             <button type="button" class="b-claro" id="btnVerLista">
               <svg class="ic" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -138,13 +144,14 @@
 
             <button type="submit" class="b-vermelho" id="btnConcluir" style="display: none;">
               <svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              Enviar Plano de Ação
+              Concluir Tratativa
             </button>
           </div>
         </form>
       </div>
     </section>
 
+    <!-- COLUNA DIREITA: LISTA DE OCORRÊNCIAS -->
     <section class="painel" id="painelLista" style="display: none;">
       <div class="cabecalho lista">
         <h2>Ocorrências Registradas</h2>
@@ -156,8 +163,8 @@
       <div class="corpo">
         <div class="filtros">
           <button type="button" class="ativo" data-filtro="todos">Todos</button>
-          <button type="button" data-filtro="pendente">Ocorrências Pendentes</button>
-          <button type="button" data-filtro="finalizado">Ocorrências Enviadas</button>
+          <button type="button" data-filtro="pendente">Pendentes</button>
+          <button type="button" data-filtro="finalizado">Concluídos</button>
         </div>
         <div id="listaFormularios"><p class="vazio">Carregando...</p></div>
       </div>
