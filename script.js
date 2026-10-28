@@ -1,8 +1,8 @@
-
+// ================= VARIÁVEIS GLOBAIS =================
 const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
 const URL_LISTAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/3fbf1a2a119441dabcb8c284dcae4cfe/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OdpmDoJPfT2zixNtGYBbnkZJkWrhs2pyVKgk1oPtOUI';
 const URL_VALIDAR_USUARIO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/b299d152bc6b4bc2a1865e21ab01b5fb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5z2scHhFAcu_y4_t8jARTGu4cZNyH5dqPuiR_oV69XQ';
-const DOMINIO_PERMITIDO = '@totalexpress.com.br'; 
+const DOMINIO_PERMITIDO = '@totalexpress.com.br';
 
 const form = document.getElementById('formPlano');
 const ICONE_CALENDARIO = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>';
@@ -15,6 +15,22 @@ let paginaAtual = 1;
 let idFormulario = '';
 let isTelaCriacao = true;
 
+// VARIÁVEIS DE ACESSO
+let emailLogado = "";
+let isAdmin = false;
+let regionalDoUsuario = "";
+
+// MAPEAMENTO DE ACESSOS
+const MAPA_REGIONAIS = {
+  'igor.pinheiro@totalexpress.com.br': 'NE',
+  'robson.santos@totalexpress.com.br': 'MG/RJ/ES',
+  'adriele.costa@totalexpress.com.br': 'SUL',
+  'leticia.lopes@totalexpress.com.br': 'SP',
+  'giovanna.gomes@totalexpress.com.br': 'CO/N'
+};
+const EMAIL_ADMIN = 'ronady.santos@totalexpress.com.br';
+
+// ================= LOGIN =================
 const telaLogin = document.getElementById('telaLogin');
 const formLogin = document.getElementById('formLogin');
 const loginEmail = document.getElementById('loginEmail');
@@ -65,7 +81,7 @@ formLogin.addEventListener('submit', async (e) => {
     if (err.name === 'AbortError') {
       mostrarErroLogin('O servidor demorou muito para responder. Tente novamente.');
     } else {
-      mostrarErroLogin('E-mail não encontrado ou conta inativa.');
+      mostrarErroLogin('Erro de conexão. Verifique sua internet.');
     }
   } finally {
     clearTimeout(timeoutId);
@@ -78,16 +94,34 @@ function liberarAcesso(nomeUsuario) {
   telaLogin.hidden = true;
   telaLogin.style.display = 'none';
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const idDaUrl = urlParams.get('id');
+  emailLogado = nomeUsuario.toLowerCase();
   
-  if (idDaUrl) {
-    setTimeout(() => {
+  if (emailLogado === EMAIL_ADMIN) {
+    isAdmin = true;
+    regionalDoUsuario = "TODAS";
+    mostrarTelaCriacao();
+  } else if (MAPA_REGIONAIS[emailLogado]) {
+    isAdmin = false;
+    regionalDoUsuario = MAPA_REGIONAIS[emailLogado];
+    
+    // Trava o select de regional para esta pessoa
+    const selectRegional = form.elements['regional'];
+    selectRegional.innerHTML = `<option>${regionalDoUsuario}</option>`;
+    selectRegional.classList.add('bloqueado');
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const idDaUrl = urlParams.get('id');
+    
+    if (idDaUrl) {
       carregarFormularios(idDaUrl);
       window.history.replaceState({}, document.title, window.location.pathname);
-    }, 1000);
+    } else {
+      mostrarTelaLista();
+    }
   } else {
-    mostrarTelaCriacao();
+    alert('Acesso negado. Seu e-mail não possui permissão de acesso.\nContate o administrador.');
+    sessionStorage.removeItem('usuarioAutenticado');
+    window.location.reload();
   }
 }
 
@@ -96,6 +130,7 @@ function mostrarErroLogin(msg) {
   loginErro.hidden = false;
 }
 
+// ================= FUNÇÕES AUXILIARES =================
 async function chamarFluxo(payload, url) {
   const resposta = await fetch(url, {
     method: 'POST',
@@ -145,7 +180,10 @@ function mostrarId() {
   document.getElementById('idForm').textContent = idFormulario;
 }
 
+// ================= CONTROLE DE TELAS =================
 function mostrarTelaCriacao() {
+  if (!isAdmin) return; // Segurança: só admin acessa essa tela
+  
   isTelaCriacao = true;
   form.reset();
   idEmEdicao = null;
@@ -153,14 +191,12 @@ function mostrarTelaCriacao() {
   mostrarId();
   atualizarContadores();
   
+  // Limpa bloqueios
   form.querySelectorAll('.bloqueado').forEach(c => c.classList.remove('bloqueado'));
-  form.querySelectorAll('input, select, textarea').forEach(c => c.readOnly = false);
+  form.querySelectorAll('input, select, textarea').forEach(c => { c.readOnly = false; c.disabled = false; });
 
   document.getElementById('tituloFormulario').textContent = 'Nova Ocorrência';
-  document.getElementById('camposExtras').style.display = 'none'; 
-  
-  document.getElementById('campoResponsavel').style.display = 'none';
-  document.getElementById('campoPrazo').style.display = 'none';
+  document.getElementById('camposExtras').style.display = 'none'; // Esconde tratativa
   
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
@@ -181,16 +217,20 @@ function mostrarTelaLista() {
   document.getElementById('tituloFormulario').textContent = 'Detalhes da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
   
-  document.getElementById('campoResponsavel').style.display = 'block';
-  document.getElementById('campoPrazo').style.display = 'block';
-  
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
-  document.getElementById('btnVoltarLista').style.display = 'inline-flex';
+  
+  // Só o Admin tem o botão de voltar para criar nova ocorrência
+  if (isAdmin) {
+    document.getElementById('btnVoltarLista').style.display = 'inline-flex';
+  } else {
+    document.getElementById('btnVoltarLista').style.display = 'none';
+  }
   
   carregarFormularios();
 }
 
+// ================= LISTAGEM =================
 document.querySelectorAll('.filtros button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
@@ -205,9 +245,8 @@ async function carregarFormularios(idParaAbrir = null) {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '<p class="vazio">Carregando...</p>';
   try {
-    // AQUI ESTÁ A MUDANÇA (envia o emailLogado)
+    // ENVIA O E-MAIL PARA O PA FILTRAR NO SERVIDOR
     const res = await chamarFluxo({ acao: 'listar', emailLogado: emailLogado }, URL_LISTAR);
-    
     const dadosBrutos = res.value || res.itens || res;
     todosOsItens = dadosBrutos.filter(item => item && (JSON.stringify(item).includes('problema') || JSON.stringify(item).includes('Problema')));
     todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
@@ -217,13 +256,8 @@ async function carregarFormularios(idParaAbrir = null) {
       if (item) {
         abrirFormulario(item);
       } else {
-        alert('Ocorrência não encontrada ou você não tem permissão para visualizá-la.');
-        // Segurança: Se não for admin, não pode ir para a tela de criação
-        if (isAdmin) {
-            mostrarTelaCriacao();
-        } else {
-            mostrarTelaLista();
-        }
+        alert('Ocorrência não encontrada ou você não tem permissão para acessá-la.');
+        mostrarTelaLista();
       }
     } else {
       desenharLista();
@@ -233,6 +267,7 @@ async function carregarFormularios(idParaAbrir = null) {
     lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
   }
 }
+
 function desenharLista() {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '';
@@ -306,6 +341,7 @@ function formatarData(valor) {
   return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
 }
 
+// ================= ABRIR E PREENCHER FORMULÁRIO =================
 function abrirFormulario(item) {
   const pegarValor = (nomes) => {
     for (let n of nomes) if (item[n] !== undefined && item[n] !== null && String(item[n]).trim() !== '') return item[n];
@@ -319,6 +355,7 @@ function abrirFormulario(item) {
   mostrarId();
   atualizarContadores();
 
+  // Carrega dados
   form.elements['regional'].value = pegarValor(['Regional', 'regional']);
   form.elements['area'].value = pegarValor(['Area', 'area', 'Área']);
   form.elements['problema'].value = pegarValor(['Problema', 'problema']);
@@ -333,26 +370,36 @@ function abrirFormulario(item) {
   const dataConc = pegarValor(['DataConclusao', 'dataConclusao']);
   if (dataConc) form.elements['dataConclusao'].value = String(dataConc).slice(0, 10);
 
+  // Muda a tela
   document.getElementById('tituloFormulario').textContent = 'Tratativa da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
-  
-  document.getElementById('campoResponsavel').style.display = 'block';
-  document.getElementById('campoPrazo').style.display = 'block';
-  
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
   
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
-  document.getElementById('btnVoltarLista').style.display = 'inline-flex';
+  
+  if (isAdmin) {
+    document.getElementById('btnVoltarLista').style.display = 'inline-flex';
+  }
 
+  // Regras de Bloqueio
   const situacao = String(pegarValor(['Situacao', 'situacao', 'Status', 'status'])).toLowerCase();
   
+  // Limpa bloqueios antigos
   form.querySelectorAll('.bloqueado').forEach(c => c.classList.remove('bloqueado'));
-  form.querySelectorAll('input, select, textarea').forEach(c => c.readOnly = false);
+  form.querySelectorAll('input, select, textarea').forEach(c => { c.readOnly = false; c.disabled = false; });
   document.getElementById('avisoEdicao').hidden = true;
 
+  // SEGURANÇA: Bloqueia a Regional para usuários não-admin
+  if (!isAdmin) {
+    const selectRegional = form.elements['regional'];
+    selectRegional.classList.add('bloqueado');
+    selectRegional.disabled = true;
+  }
+
   if (situacao === 'pendente de preenchimento' || situacao === 'pendente') {
+    // Trava os campos iniciais (Regional, Area, Problema) para quem vai tratar
     ['regional', 'area', 'problema'].forEach(id => {
       const campo = form.elements[id];
       campo.classList.add('bloqueado');
@@ -362,21 +409,24 @@ function abrirFormulario(item) {
     document.getElementById('avisoEdicao').hidden = false;
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   } else if (situacao === 'finalizado' || situacao === 'concluído') {
+    // Já foi concluído. Trava tudo.
     ['regional', 'area', 'problema', 'causa', 'plano', 'responsavel', 'prazo'].forEach(id => {
       const campo = form.elements[id];
       campo.classList.add('bloqueado');
       if (campo.tagName !== 'SELECT') campo.readOnly = true;
     });
-    document.getElementById('textoAvisoEdicao').textContent = 'Ocorrência finalizada. Apenas o Status e Comentários podem ser alterados.';
+    document.getElementById('textoAvisoEdicao').textContent = 'Ocorrência finalizada. Apenas Status e Comentários podem ser alterados.';
     document.getElementById('avisoEdicao').hidden = false;
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   } else {
+    // Em andamento
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   }
 
   document.getElementById('formPlano').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// ================= ENVIOS (CRIAR E CONCLUIR) =================
 document.getElementById('btnVerLista').addEventListener('click', mostrarTelaLista);
 document.getElementById('btnVoltarLista').addEventListener('click', mostrarTelaCriacao);
 document.getElementById('btnAtualizar').addEventListener('click', () => carregarFormularios());
@@ -384,6 +434,7 @@ document.getElementById('btnAtualizar').addEventListener('click', () => carregar
 form.addEventListener('submit', async function (e) {
   e.preventDefault();
   
+  // Se for a tela de criação (Nova Ocorrência)
   if (isTelaCriacao) {
     if (!form.elements['regional'].value || !form.elements['area'].value || !form.elements['problema'].value) {
       alert('Preencha a Regional, Área e o Problema identificado.');
@@ -402,6 +453,7 @@ form.addEventListener('submit', async function (e) {
         situacao: 'Pendente de preenchimento' 
       }, URL_SALVAR);
       
+      // Verifica a resposta do PA para ver se a regional tem e-mail
       if (resposta && resposta.sucesso === false) {
         alert(resposta.mensagem); 
       } else {
@@ -414,12 +466,8 @@ form.addEventListener('submit', async function (e) {
     botao.disabled = false;
     botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Ocorrência';
   } 
+  // Se for a tela de Tratativa (Concluir)
   else {
-    if (!form.elements['responsavel'].value) {
-      alert('Preencha o Responsável pela Execução.');
-      return;
-    }
-    
     const botao = document.getElementById('btnConcluir');
     botao.disabled = true;
     botao.innerHTML = 'Salvando...';
@@ -442,10 +490,12 @@ form.addEventListener('submit', async function (e) {
   }
 });
 
+// Adiciona a animação do spinner no CSS
 const style = document.createElement('style');
 style.innerHTML = `@keyframes girar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
 document.head.appendChild(style);
 
+// Inicia
 idFormulario = gerarIdFormulario();
 mostrarId();
 atualizarContadores();
