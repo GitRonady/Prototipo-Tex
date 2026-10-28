@@ -14,10 +14,20 @@
 body { margin: 0; padding: 8px; background: var(--fundo); font-family: 'Segoe UI', Arial, sans-serif; color: var(--texto); }
 svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-.layout { display: grid; grid-template-columns: minmax(0, 700px) minmax(0, 340px); justify-content: space-between; gap: 12px; align-items: start; margin: 0 auto; height: calc(100vh - 16px); max-width: 1100px; transition: all 0.3s ease; }
+/* TABELAS LADO A LADO NOS EXTREMOS */
+.layout { 
+  display: grid; 
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); 
+  gap: 16px; 
+  align-items: start; 
+  width: 100%; 
+  max-width: none; 
+  margin: 0; 
+  height: calc(100vh - 16px); 
+}
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; height: auto; } }
 
-.layout.sem-lista { grid-template-columns: 1fr !important; max-width: 700px; }
+.layout.sem-lista { grid-template-columns: 1fr !important; max-width: 700px; margin: 0 auto; }
 
 .painel { background: #fff; border: 1px solid var(--borda); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(24,29,62,.08); display: flex; flex-direction: column; }
 .cabecalho { background: var(--azul); color: #fff; padding: 12px 22px 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -76,6 +86,27 @@ button:disabled { opacity: .6; cursor: wait; }
 input.faltando, select.faltando, textarea.faltando { border-color: var(--laranja); background: #fffbf0; box-shadow: 0 0 0 3px #ffe3a3; }
 .bloqueado { background-color: #e9ecef !important; color: #6c757d !important; border-color: #ced4da !important; pointer-events: none; cursor: not-allowed; box-shadow: none !important; }
 
+/* =========================================
+   DESTAQUE VISUAL DOS CAMPOS DE TEXTO (PROBLEMA, CAUSA, PLANO)
+   ========================================= */
+textarea#problema, textarea#causa, textarea#plano {
+  border: 1px solid #f4baba !important; /* Vermelho bem suave */
+  border-radius: 5px; /* Cantos levemente arredondados */
+}
+
+textarea#problema:focus, textarea#causa:focus, textarea#plano:focus {
+  outline: none !important;
+  border-color: #e28a8a !important; /* Vermelho um pouco mais forte no foco */
+  box-shadow: 0 0 0 2px rgba(226, 138, 138, 0.2) !important;
+}
+
+/* Garante que a borda vermelha clara se mantenha mesmo quando bloqueado */
+textarea#problema.bloqueado, textarea#causa.bloqueado, textarea#plano.bloqueado {
+  border-color: #f4baba !important;
+  background-color: #e9ecef !important; /* Mantém o fundo cinza de bloqueio */
+}
+
+/* TELA DE LOGIN */
 .login-overlay { position: fixed; inset: 0; background: var(--azul); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
 .login-overlay[hidden] { display: none !important; }
 .login-card { background: #fff; border-radius: 8px; padding: 32px 28px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, .4); }
