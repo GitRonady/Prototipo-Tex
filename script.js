@@ -25,7 +25,7 @@ const MAPA_REGIONAIS = {
   'igor.pinheiro@totalexpress.com.br': 'NE',
   'robson.santos@totalexpress.com.br': 'MG/RJ/ES',
   'adriele.costa@totalexpress.com.br': 'SUL',
-  'leticia.lopes@totalexpress.com.br': 'SP',
+  'debora.medici@totalexpress.com.br': 'SP',
   'giovanna.gomes@totalexpress.com.br': 'CO/N'
 };
 const EMAIL_ADMIN = 'ronady.santos@totalexpress.com.br';
