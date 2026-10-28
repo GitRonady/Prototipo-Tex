@@ -181,6 +181,29 @@ function mostrarId() {
   document.getElementById('idForm').textContent = idFormulario;
 }
 
+// ================= FILTRO DE PERMISSÃO (camada extra no front) =================
+function normalizarRegional(v) {
+  return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
+}
+
+function lerRegionalItem(item) {
+  for (const chave of Object.keys(item)) {
+    if (chave.toLowerCase() === 'regional') {
+      const v = item[chave];
+      // Colunas de escolha do SharePoint podem vir como objeto { Value: 'SUL' }
+      return (v && typeof v === 'object') ? (v.Value || '') : v;
+    }
+  }
+  return '';
+}
+
+function filtrarPorPermissao(itens) {
+  if (isAdmin) return itens; // Admin vê todas as regionais
+  const minha = normalizarRegional(regionalDoUsuario);
+  if (!minha) return []; // sem regional definida = não mostra nada
+  return itens.filter(i => normalizarRegional(lerRegionalItem(i)) === minha);
+}
+
 // ================= CONTROLE DE TELAS =================
 function mostrarTelaCriacao() {
   if (!isAdmin) return; // Segurança: só admin acessa essa tela
@@ -206,6 +229,7 @@ function mostrarTelaCriacao() {
   document.getElementById('btnEnviarOcorrencia').style.display = 'inline-flex';
   document.getElementById('btnVoltarLista').style.display = 'none';
   document.getElementById('btnConcluir').style.display = 'none';
+  document.getElementById('btnSalvarProgresso').style.display = 'none';
   
   document.getElementById('avisoEdicao').hidden = true;
 }
@@ -220,6 +244,7 @@ function mostrarTelaLista() {
   
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
+  document.getElementById('btnSalvarProgresso').style.display = 'none';
   
   // Só o Admin tem o botão de voltar para criar nova ocorrência
   if (isAdmin) {
@@ -241,28 +266,7 @@ document.querySelectorAll('.filtros button').forEach(btn => {
     desenharLista();
   });
 });
-// ================= FILTRO DE PERMISSÃO (camada extra no front) =================
-function normalizarRegional(v) {
-  return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
-}
 
-function lerRegionalItem(item) {
-  for (const chave of Object.keys(item)) {
-    if (chave.toLowerCase() === 'regional') {
-      const v = item[chave];
-      // Colunas de escolha do SharePoint podem vir como objeto { Value: 'SUL' }
-      return (v && typeof v === 'object') ? (v.Value || '') : v;
-    }
-  }
-  return '';
-}
-
-function filtrarPorPermissao(itens) {
-  if (isAdmin) return itens; // Admin vê todas as regionais
-  const minha = normalizarRegional(regionalDoUsuario);
-  if (!minha) return []; // sem regional definida = não mostra nada
-  return itens.filter(i => normalizarRegional(lerRegionalItem(i)) === minha);
-}
 async function carregarFormularios(idParaAbrir = null) {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '<p class="vazio">Carregando...</p>';
@@ -292,6 +296,7 @@ async function carregarFormularios(idParaAbrir = null) {
     lista.innerHTML = '<p class="vazio">Não foi possível carregar a lista.</p>';
   }
 }
+
 function desenharLista() {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '';
@@ -360,6 +365,7 @@ function desenharLista() {
     lista.appendChild(nav);
   }
 }
+
 function formatarData(valor) {
   if (!valor) return '';
   const d = new Date(valor);
@@ -449,6 +455,11 @@ function abrirFormulario(item) {
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   }
 
+  // Botão "Salvar Progresso": só para não-Admin e só se a ocorrência não estiver finalizada
+  const btnSalvar = document.getElementById('btnSalvarProgresso');
+  const jaFinalizado = (situacao === 'finalizado' || situacao === 'concluído');
+  btnSalvar.style.display = (!isAdmin && !jaFinalizado) ? 'inline-flex' : 'none';
+
   document.getElementById('formPlano').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -456,6 +467,39 @@ function abrirFormulario(item) {
 document.getElementById('btnVerLista').addEventListener('click', mostrarTelaLista);
 document.getElementById('btnVoltarLista').addEventListener('click', mostrarTelaCriacao);
 document.getElementById('btnAtualizar').addEventListener('click', () => carregarFormularios());
+
+// ================= SALVAR PROGRESSO (REGIONAIS) =================
+document.getElementById('btnSalvarProgresso').addEventListener('click', async function () {
+  if (isAdmin || !idEmEdicao) return;
+
+  const botao = this;
+  const htmlOriginal = botao.innerHTML;
+  botao.disabled = true;
+  botao.innerHTML = 'Salvando...';
+
+  try {
+    // Se ainda estiver "Pendente de preenchimento", acompanha a nova situação
+    const campoStatus = form.elements['status'];
+    if (campoStatus.value === 'Pendente de preenchimento') campoStatus.value = 'Em Andamento';
+
+    await chamarFluxo({
+      ...lerCampos(),
+      acao: 'atualizar',
+      id: idEmEdicao,
+      idFormulario: idFormulario,
+      situacao: 'Em Andamento'
+    }, URL_SALVAR);
+
+    alert('Progresso salvo com sucesso! A ocorrência continua em andamento.');
+    carregarFormularios(); // atualiza a lista em segundo plano, sem fechar o chamado
+  } catch (erro) {
+    console.error(erro);
+    alert('Erro ao salvar o progresso: ' + erro.message);
+  }
+
+  botao.disabled = false;
+  botao.innerHTML = htmlOriginal;
+});
 
 form.addEventListener('submit', async function (e) {
   e.preventDefault();
