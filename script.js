@@ -72,7 +72,6 @@ formLogin.addEventListener('submit', async (e) => {
     const dados = await resp.json();
 
     if (dados.valido) {
-      // ESSA É A LINHA QUE PRECISA ESTAR ASSIM (usando 'email', não 'dados.nome')
       sessionStorage.setItem('usuarioAutenticado', email); 
       liberarAcesso(email); 
     } else {
@@ -181,37 +180,48 @@ function mostrarId() {
   document.getElementById('idForm').textContent = idFormulario;
 }
 
-// ================= FILTRO DE PERMISSÃO (camada extra no front) =================
+function formatarData(valor) {
+  if (!valor) return '';
+  const d = new Date(valor);
+  if (isNaN(d)) return '';
+  return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+}
+
+function formatarDataSimples(valor) {
+  if (!valor) return '';
+  const d = new Date(valor);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString('pt-BR');
+}
+
+// ================= FILTRO DE PERMISSÃO =================
 function normalizarRegional(v) {
   return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
 }
 
-// Retorna a regional do item, ou null se o item não tiver nenhum campo de regional
 function lerRegionalItem(item) {
   const chaves = Object.keys(item);
-  // Mesma lógica de busca do restante do código: nome exato primeiro, depois nome parecido
   const chave = chaves.find(c => c.toLowerCase() === 'regional') ||
                 chaves.find(c => c.toLowerCase().includes('regional'));
   if (!chave) return null;
   const v = item[chave];
-  // Colunas de escolha do SharePoint podem vir como objeto { Value: 'SUL' }
   return (v && typeof v === 'object') ? (v.Value || '') : v;
 }
 
 function filtrarPorPermissao(itens) {
-  if (isAdmin) return itens; // Admin vê todas as regionais
+  if (isAdmin) return itens;
   const minha = normalizarRegional(regionalDoUsuario);
-  if (!minha) return []; // sem regional definida = não mostra nada
+  if (!minha) return [];
   return itens.filter(i => {
     const reg = lerRegionalItem(i);
-    if (reg === null) return true; // sem campo regional na resposta: confia no filtro do Power Automate
+    if (reg === null) return true;
     return normalizarRegional(reg) === minha;
   });
 }
 
 // ================= CONTROLE DE TELAS =================
 function mostrarTelaCriacao() {
-  if (!isAdmin) return; // Segurança: só admin acessa essa tela
+  if (!isAdmin) return;
   
   isTelaCriacao = true;
   form.reset();
@@ -220,16 +230,16 @@ function mostrarTelaCriacao() {
   mostrarId();
   atualizarContadores();
   
-  // Limpa bloqueios
   form.querySelectorAll('.bloqueado').forEach(c => c.classList.remove('bloqueado'));
   form.querySelectorAll('input, select, textarea').forEach(c => { c.readOnly = false; c.disabled = false; });
 
   document.getElementById('tituloFormulario').textContent = 'Nova Ocorrência';
-  document.getElementById('camposExtras').style.display = 'none'; // Esconde tratativa
+  document.getElementById('camposExtras').style.display = 'none';
   
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
   
+  // CONTROLE DE BOTÕES AQUI
   document.getElementById('btnVerLista').style.display = 'inline-flex';
   document.getElementById('btnEnviarOcorrencia').style.display = 'inline-flex';
   document.getElementById('btnVoltarLista').style.display = 'none';
@@ -247,11 +257,12 @@ function mostrarTelaLista() {
   document.getElementById('tituloFormulario').textContent = 'Detalhes da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
   
+  // CONTROLE DE BOTÕES AQUI
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
   document.getElementById('btnSalvarProgresso').style.display = 'none';
+  document.getElementById('btnConcluir').style.display = 'none';
   
-  // Só o Admin tem o botão de voltar para criar nova ocorrência
   if (isAdmin) {
     document.getElementById('btnVoltarLista').style.display = 'inline-flex';
   } else {
@@ -276,12 +287,10 @@ async function carregarFormularios(idParaAbrir = null) {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '<p class="vazio">Carregando...</p>';
   try {
-    // ENVIA O E-MAIL PARA O PA FILTRAR NO SERVIDOR
     const res = await chamarFluxo({ acao: 'listar', emailLogado: emailLogado }, URL_LISTAR);
     const dadosBrutos = res.value || res.itens || res;
     const validos = dadosBrutos.filter(item => item && (JSON.stringify(item).includes('problema') || JSON.stringify(item).includes('Problema')));
 
-    // CAMADA EXTRA DE SEGURANÇA: regional só enxerga a própria regional
     todosOsItens = filtrarPorPermissao(validos);
     todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
 
@@ -312,7 +321,6 @@ function desenharLista() {
     return null;
   };
 
-  // Validação visual antes de renderizar (Admin = todas; Regional = só a dela)
   const base = filtrarPorPermissao(todosOsItens);
 
   let itensFiltrados = base;
@@ -353,6 +361,25 @@ function desenharLista() {
       info.append(linhaData);
     }
 
+    // ===== LINHA DE DATAS DO PLANO =====
+    const dPrevIni  = pegarValor(item, ['DataPrevisaoInicio',    'dataPrevisaoInicio',    'PrevisaoInicio']);
+    const dIniReal  = pegarValor(item, ['DataInicioReal',        'dataInicioReal',        'InicioReal']);
+    const dPrevFim  = pegarValor(item, ['DataPrevisaoConclusao', 'dataPrevisaoConclusao', 'PrevisaoConclusao', 'Prazo', 'prazo']);
+    const dFimReal  = pegarValor(item, ['DataConclusaoReal',     'dataConclusaoReal',     'ConclusaoReal',     'DataConclusao', 'dataConclusao']);
+
+    const pedacos = [];
+    if (dPrevIni) pedacos.push('Prev. início: ' + formatarDataSimples(dPrevIni));
+    if (dIniReal) pedacos.push('Início real: ' + formatarDataSimples(dIniReal));
+    if (dPrevFim) pedacos.push('Prev. fim: '    + formatarDataSimples(dPrevFim));
+    if (dFimReal) pedacos.push('Fim real: '     + formatarDataSimples(dFimReal));
+
+    if (pedacos.length) {
+      const linhaPlano = criar('p', 'data plano');
+      linhaPlano.insertAdjacentHTML('beforeend', ICONE_CALENDARIO);
+      linhaPlano.append(pedacos.join(' • '));
+      info.append(linhaPlano);
+    }
+
     const botao = criar('button', 'b-azul', isFinalizado ? 'Visualizar' : 'Continuar');
     botao.type = 'button';
     botao.addEventListener('click', () => abrirFormulario(item));
@@ -371,13 +398,6 @@ function desenharLista() {
   }
 }
 
-function formatarData(valor) {
-  if (!valor) return '';
-  const d = new Date(valor);
-  if (isNaN(d)) return '';
-  return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
-}
-
 // ================= ABRIR E PREENCHER FORMULÁRIO =================
 function abrirFormulario(item) {
   const pegarValor = (nomes) => {
@@ -392,7 +412,7 @@ function abrirFormulario(item) {
   mostrarId();
   atualizarContadores();
 
-  // Carrega dados
+  // Carrega dados de texto
   form.elements['regional'].value = pegarValor(['Regional', 'regional']);
   form.elements['area'].value = pegarValor(['Area', 'area', 'Área']);
   form.elements['problema'].value = pegarValor(['Problema', 'problema']);
@@ -402,17 +422,18 @@ function abrirFormulario(item) {
   form.elements['status'].value = pegarValor(['Status', 'status']) || 'Pendente de preenchimento';
   form.elements['comentario'].value = pegarValor(['Comentario', 'comentario', 'Comentário']);
   
+  // Carrega as 4 datas (com fallback para os nomes antigos)
   const mapaDatas = {
-  dataPrevisaoInicio:    ['DataPrevisaoInicio',    'dataPrevisaoInicio',    'PrevisaoInicio'],
-  dataInicioReal:        ['DataInicioReal',        'dataInicioReal',        'InicioReal'],
-  dataPrevisaoConclusao: ['DataPrevisaoConclusao', 'dataPrevisaoConclusao', 'PrevisaoConclusao', 'Prazo', 'prazo'],
-  dataConclusaoReal:     ['DataConclusaoReal',     'dataConclusaoReal',     'ConclusaoReal',     'DataConclusao', 'dataConclusao']
-};
+    dataPrevisaoInicio:    ['DataPrevisaoInicio',    'dataPrevisaoInicio',    'PrevisaoInicio'],
+    dataInicioReal:        ['DataInicioReal',        'dataInicioReal',        'InicioReal'],
+    dataPrevisaoConclusao: ['DataPrevisaoConclusao', 'dataPrevisaoConclusao', 'PrevisaoConclusao', 'Prazo', 'prazo'],
+    dataConclusaoReal:     ['DataConclusaoReal',     'dataConclusaoReal',     'ConclusaoReal',     'DataConclusao', 'dataConclusao']
+  };
 
-Object.keys(mapaDatas).forEach(campo => {
-  const valor = pegarValor(mapaDatas[campo]);
-  if (valor) form.elements[campo].value = String(valor).slice(0, 10);
-});
+  Object.keys(mapaDatas).forEach(campo => {
+    const valor = pegarValor(mapaDatas[campo]);
+    if (valor && form.elements[campo]) form.elements[campo].value = String(valor).slice(0, 10);
+  });
 
   // Muda a tela
   document.getElementById('tituloFormulario').textContent = 'Tratativa da Ocorrência';
@@ -420,22 +441,23 @@ Object.keys(mapaDatas).forEach(campo => {
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
   
+  // CONTROLE DE BOTÕES NA TELA DE TRATATIVA
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
   
   if (isAdmin) {
     document.getElementById('btnVoltarLista').style.display = 'inline-flex';
+  } else {
+    document.getElementById('btnVoltarLista').style.display = 'none';
   }
 
   // Regras de Bloqueio
   const situacao = String(pegarValor(['Situacao', 'situacao', 'Status', 'status'])).toLowerCase();
   
-  // Limpa bloqueios antigos
   form.querySelectorAll('.bloqueado').forEach(c => c.classList.remove('bloqueado'));
   form.querySelectorAll('input, select, textarea').forEach(c => { c.readOnly = false; c.disabled = false; });
   document.getElementById('avisoEdicao').hidden = true;
 
-  // SEGURANÇA: Bloqueia a Regional para usuários não-admin
   if (!isAdmin) {
     const selectRegional = form.elements['regional'];
     selectRegional.classList.add('bloqueado');
@@ -443,7 +465,6 @@ Object.keys(mapaDatas).forEach(campo => {
   }
 
   if (situacao === 'pendente de preenchimento' || situacao === 'pendente') {
-    // Trava os campos iniciais (Regional, Area, Problema) para quem vai tratar
     ['regional', 'area', 'problema'].forEach(id => {
       const campo = form.elements[id];
       campo.classList.add('bloqueado');
@@ -453,9 +474,8 @@ Object.keys(mapaDatas).forEach(campo => {
     document.getElementById('avisoEdicao').hidden = false;
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   } else if (situacao === 'finalizado' || situacao === 'concluído') {
-    // Já foi concluído. Trava tudo.
     ['regional', 'area', 'problema', 'causa', 'plano', 'responsavel',
- 'dataPrevisaoInicio', 'dataInicioReal', 'dataPrevisaoConclusao', 'dataConclusaoReal'].forEach(id => {
+     'dataPrevisaoInicio', 'dataInicioReal', 'dataPrevisaoConclusao', 'dataConclusaoReal'].forEach(id => {
       const campo = form.elements[id];
       campo.classList.add('bloqueado');
       if (campo.tagName !== 'SELECT') campo.readOnly = true;
@@ -464,11 +484,9 @@ Object.keys(mapaDatas).forEach(campo => {
     document.getElementById('avisoEdicao').hidden = false;
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   } else {
-    // Em andamento
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   }
 
-  // Botão "Salvar Progresso": só para não-Admin e só se a ocorrência não estiver finalizada
   const btnSalvar = document.getElementById('btnSalvarProgresso');
   const jaFinalizado = (situacao === 'finalizado' || situacao === 'concluído');
   btnSalvar.style.display = (!isAdmin && !jaFinalizado) ? 'inline-flex' : 'none';
@@ -491,7 +509,6 @@ document.getElementById('btnSalvarProgresso').addEventListener('click', async fu
   botao.innerHTML = 'Salvando...';
 
   try {
-    // Se ainda estiver "Pendente de preenchimento", acompanha a nova situação
     const campoStatus = form.elements['status'];
     if (campoStatus.value === 'Pendente de preenchimento') campoStatus.value = 'Em Andamento';
 
@@ -504,7 +521,7 @@ document.getElementById('btnSalvarProgresso').addEventListener('click', async fu
     }, URL_SALVAR);
 
     alert('Progresso salvo com sucesso! A ocorrência continua em andamento.');
-    carregarFormularios(); // atualiza a lista em segundo plano, sem fechar o chamado
+    carregarFormularios();
   } catch (erro) {
     console.error(erro);
     alert('Erro ao salvar o progresso: ' + erro.message);
@@ -536,7 +553,6 @@ form.addEventListener('submit', async function (e) {
         situacao: 'Pendente de preenchimento' 
       }, URL_SALVAR);
       
-      // Verifica a resposta do PA para ver se a regional tem e-mail
       if (resposta && resposta.sucesso === false) {
         alert(resposta.mensagem); 
       } else {
@@ -545,7 +561,7 @@ form.addEventListener('submit', async function (e) {
       }
     } catch (erro) {
       console.error("ERRO COMPLETO:", erro);
-      alert('Erro ao salvar: ' + erro.message); // Agora vai mostrar a mensagem real!
+      alert('Erro ao salvar: ' + erro.message);
     }
     botao.disabled = false;
     botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Ocorrência';
@@ -555,6 +571,27 @@ form.addEventListener('submit', async function (e) {
     const botao = document.getElementById('btnConcluir');
     botao.disabled = true;
     botao.innerHTML = 'Salvando...';
+
+    // VALIDAÇÃO DAS DATAS
+    const dPrevisaoInicio    = form.elements['dataPrevisaoInicio'].value;
+    const dInicioReal        = form.elements['dataInicioReal'].value;
+    const dPrevisaoConclusao = form.elements['dataPrevisaoConclusao'].value;
+    const dConclusaoReal     = form.elements['dataConclusaoReal'].value;
+
+    const compara = (a, b, msg) => {
+      if (a && b && a > b) { alert(msg); throw new Error(msg); }
+    };
+
+    try {
+      compara(dPrevisaoInicio,    dPrevisaoConclusao, 'A previsão de início não pode ser depois da previsão de conclusão.');
+      compara(dPrevisaoInicio,    dInicioReal,        'A previsão de início não pode ser depois do início real.');
+      compara(dInicioReal,        dConclusaoReal,     'O início real não pode ser depois da conclusão real.');
+      compara(dPrevisaoConclusao, dConclusaoReal,     'A previsão de conclusão não pode ser depois da conclusão real.');
+    } catch (e) {
+      botao.disabled = false;
+      botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Concluir Tratativa';
+      return;
+    }
 
     try {
       await chamarFluxo({ 
@@ -567,7 +604,8 @@ form.addEventListener('submit', async function (e) {
       alert('Tratativa concluída com sucesso!');
       mostrarTelaLista();
     } catch (erro) {
-      alert('Erro ao salvar tratativa.');
+      console.error("ERRO COMPLETO:", erro);
+      alert('Erro ao salvar tratativa: ' + erro.message);
     }
     botao.disabled = false;
     botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Concluir Tratativa';
