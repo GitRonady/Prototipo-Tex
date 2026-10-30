@@ -1,4 +1,4 @@
-// ================= VARIÁVEIS GLOBAIS =================
+//VARIÁVEIS GLOBAIS
 const URL_SALVAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/348016b3bde54a47b4159b6b45544cba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NlhP96NiVsK85m-VTk7gLW9qbFpsnTqMR-YP6R5ZO60';
 const URL_LISTAR = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/3fbf1a2a119441dabcb8c284dcae4cfe/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=OdpmDoJPfT2zixNtGYBbnkZJkWrhs2pyVKgk1oPtOUI';
 const URL_VALIDAR_USUARIO = 'https://defaultb61d49822acd47e681e86b2c66e20b.13.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/b299d152bc6b4bc2a1865e21ab01b5fb/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5z2scHhFAcu_y4_t8jARTGu4cZNyH5dqPuiR_oV69XQ';
@@ -30,7 +30,7 @@ const MAPA_REGIONAIS = {
 };
 const EMAIL_ADMIN = 'ronady.santos@totalexpress.com.br';
 
-// ================= LOGIN =================
+// LOGIN
 const telaLogin = document.getElementById('telaLogin');
 const formLogin = document.getElementById('formLogin');
 const loginEmail = document.getElementById('loginEmail');
@@ -130,7 +130,7 @@ function mostrarErroLogin(msg) {
   loginErro.hidden = false;
 }
 
-// ================= FUNÇÕES AUXILIARES =================
+// FUNÇÕES AUXILIARES 
 async function chamarFluxo(payload, url) {
   const resposta = await fetch(url, {
     method: 'POST',
@@ -194,7 +194,7 @@ function formatarDataSimples(valor) {
   return d.toLocaleDateString('pt-BR');
 }
 
-// ================= FILTRO DE PERMISSÃO =================
+//FILTRO DE PERMISSÃO
 function normalizarRegional(v) {
   return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
 }
@@ -219,7 +219,7 @@ function filtrarPorPermissao(itens) {
   });
 }
 
-// ================= CONTROLE DE TELAS =================
+//  CONTROLE DE TELAS
 function mostrarTelaCriacao() {
   if (!isAdmin) return;
   
@@ -272,7 +272,7 @@ function mostrarTelaLista() {
   carregarFormularios();
 }
 
-// ================= LISTAGEM =================
+//  LISTAGEM 
 document.querySelectorAll('.filtros button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
@@ -361,7 +361,7 @@ function desenharLista() {
       info.append(linhaData);
     }
 
-    // ===== LINHA DE DATAS DO PLANO =====
+    // LINHA DE DATAS DO PLANO
     const dPrevIni  = pegarValor(item, ['DataPrevisaoInicio',    'dataPrevisaoInicio',    'PrevisaoInicio']);
     const dIniReal  = pegarValor(item, ['DataInicioReal',        'dataInicioReal',        'InicioReal']);
     const dPrevFim  = pegarValor(item, ['DataPrevisaoConclusao', 'dataPrevisaoConclusao', 'PrevisaoConclusao', 'Prazo', 'prazo']);
@@ -398,7 +398,7 @@ function desenharLista() {
   }
 }
 
-// ================= ABRIR E PREENCHER FORMULÁRIO =================
+//ABRIR E PREENCHER FORMULÁRIO
 function abrirFormulario(item) {
   const pegarValor = (nomes) => {
     for (let n of nomes) if (item[n] !== undefined && item[n] !== null && String(item[n]).trim() !== '') return item[n];
@@ -494,12 +494,12 @@ function abrirFormulario(item) {
   document.getElementById('formPlano').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ================= ENVIOS (CRIAR E CONCLUIR) =================
+//ENVIOS (CRIAR E CONCLUIR)
 document.getElementById('btnVerLista').addEventListener('click', mostrarTelaLista);
 document.getElementById('btnVoltarLista').addEventListener('click', mostrarTelaCriacao);
 document.getElementById('btnAtualizar').addEventListener('click', () => carregarFormularios());
 
-// ================= SALVAR PROGRESSO (REGIONAIS) =================
+// SALVAR PROGRESSO (REGIONAIS)
 document.getElementById('btnSalvarProgresso').addEventListener('click', async function () {
   if (isAdmin || !idEmEdicao) return;
 
