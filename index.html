@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestão de Ocorrências - Torre de Controle</title>
+  <title>Plano de Ação - Torre de Controle</title>
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <div id="telaLogin" class="login-overlay">
     <div class="login-card">
       <div class="login-cabecalho">
-        <h1>Torre de Controle</h1>
+        <h1>Plano de Ação - TC</h1>
         <p>Informe seu e-mail</p>
       </div>
       <form id="formLogin" class="login-form">
@@ -28,7 +28,7 @@
     <!-- COLUNA ESQUERDA: FORMULÁRIO -->
     <section class="painel" id="painelFormulario">
       <div class="cabecalho">
-        <h1>Torre de Controle</h1>
+        <h1>Plano de Ação - TC</h1>
       </div>
       <div class="corpo">
         <form id="formPlano" class="caixa">
@@ -73,7 +73,7 @@
 
           <div class="campo">
             <label for="problema">Problema Identificado<b>*</b></label>
-            <textarea id="problema" name="problema" class="obrigatorio-suave" maxlength="500" placeholder="Descreva o problema operacional..." required></textarea>
+            <textarea id="problema" name="problema" class="obrigatorio-suave" maxlength="500" placeholder="Descreva o problema..." required></textarea>
             <div class="contador"></div>
           </div>
 
@@ -81,19 +81,19 @@
           <div id="camposExtras" style="display: none;">
             <div class="campo">
               <label for="causa">Causa Raiz<b>*</b></label>
-              <textarea id="causa" name="causa" class="obrigatorio-suave" maxlength="500" placeholder="Qual é a causa identificada?"></textarea>
+              <textarea id="causa" name="causa" class="obrigatorio-suave" maxlength="500" placeholder="Descreva a causa identificada..."></textarea>
               <div class="contador"></div>
             </div>
 
             <div class="campo">
               <label for="plano">Plano de ação<b>*</b></label>
-              <textarea id="plano" name="plano" class="obrigatorio-suave" maxlength="500" placeholder="O que será feito para resolver?"></textarea>
+              <textarea id="plano" name="plano" class="obrigatorio-suave" maxlength="500" placeholder="Qual plano de ação?"></textarea>
               <div class="contador"></div>
             </div>
 
             <div class="campo">
-              <label for="responsavel">Responsável pela Execução<b>*</b></label>
-              <input type="text" id="responsavel" name="responsavel" maxlength="500" placeholder="Nome do responsável">
+              <label for="responsavel">Responsável<b>*</b></label>
+              <input type="text" id="responsavel" name="responsavel" maxlength="500" placeholder="Nome do responsável...">
             </div>
 
             <!-- NOVAS DATAS -->
@@ -123,7 +123,7 @@
               <div class="campo">
                 <label for="status">Status</label>
                 <select id="status" name="status">
-                  <option>Pendente de preenchimento</option>
+                  <option>Pendente</option>
                   <option>Em Andamento</option>
                   <option>Concluído</option>
                   <option>Cancelado</option>
@@ -181,8 +181,8 @@
       <div class="corpo">
         <div class="filtros">
           <button type="button" class="ativo" data-filtro="todos">Todos</button>
-          <button type="button" data-filtro="pendente">Planos de Ação Pendentes</button>
-          <button type="button" data-filtro="finalizado">Planos de Ação Enviados</button>
+          <button type="button" data-filtro="pendente">Planos Pendentes</button>
+          <button type="button" data-filtro="finalizado">Planos Enviados</button>
         </div>
         <div id="listaFormularios"><p class="vazio">Carregando...</p></div>
       </div>
