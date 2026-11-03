@@ -330,7 +330,7 @@ function desenharLista() {
   let itensFiltrados = base;
   if (filtroAtual === 'pendente') {
     itensFiltrados = base.filter(i => !ehFinalizado(pegarValor(i, ['Situacao', 'situacao', 'Status', 'status'])));
-  } else if (filtroAtual === 'finalizado') {
+  } else if (filtroAtual === "finalizado") {
     itensFiltrados = base.filter(i => ehFinalizado(pegarValor(i, ['Situacao', 'situacao', 'Status', 'status'])));
   }
 
