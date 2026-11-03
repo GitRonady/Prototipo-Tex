@@ -322,10 +322,15 @@ function desenharLista() {
   };
 
   const base = filtrarPorPermissao(todosOsItens);
-
+  const ehFinalizado = (v) =>{
+    const s = String(v || '').toLowerCase();
+  };
   let itensFiltrados = base;
-  if (filtroAtual === 'pendente') itensFiltrados = base.filter(i => pegarValor(i, ['Situacao', 'situacao', 'Status', 'status']) !== 'Finalizado');
-  else if (filtroAtual === 'finalizado') itensFiltrados = base.filter(i => pegarValor(i, ['Situacao', 'situacao', 'Status', 'status']) === 'Finalizado');
+  if (filtroAtual === 'pendente') {
+    itensFiltrados = base.filter(i => !ehFinalizado(pagaValor(i ['Situacao', 'situacao', 'Status', 'status'])));
+  } else if (filtroAtual === 'finalizado") {
+    itensFiltrados = base.filter(i => ehFinalizado(pagaValor(i ['Situacao', 'situacao', 'Status', 'status'])));
+}
 
   if (itensFiltrados.length === 0) {
     lista.innerHTML = '<p class="vazio">Nenhuma ocorrência encontrada.</p>';
@@ -594,12 +599,14 @@ form.addEventListener('submit', async function (e) {
     }
 
     try {
+      form.elements['status'].value = 'concluído';
       await chamarFluxo({ 
         ...lerCampos(), 
         acao: 'atualizar', 
         id: idEmEdicao, 
         idFormulario: idFormulario, 
-        situacao: 'Finalizado' 
+        situacao: 'Finalizado'
+        status: 'concluído'
       }, URL_SALVAR);
       alert('Tratativa concluída com sucesso!');
       mostrarTelaLista();
