@@ -630,3 +630,33 @@ document.head.appendChild(style);
 idFormulario = gerarIdFormulario();
 mostrarId();
 atualizarContadores();
+
+// ==================== LOGOFF ====================
+const btnSair = document.getElementById('btnSair');
+const spanUsuario = document.getElementById('usuarioLogado');
+
+// Mostra/esconde o botão conforme o estado de login
+function atualizarCabecalho() {
+  const email = sessionStorage.getItem('usuarioAutenticado');
+  if (email) {
+    document.body.classList.remove('nao-logado');
+    spanUsuario.textContent = email;
+  } else {
+    document.body.classList.add('nao-logado');
+    spanUsuario.textContent = '';
+  }
+}
+
+// Executa ao carregar
+atualizarCabecalho();
+
+// Clique no botão Sair
+btnSair.addEventListener('click', () => {
+  if (!confirm('Deseja realmente sair do sistema?')) return;
+
+  // 1) Limpa TODA a sessão
+  sessionStorage.clear();
+
+  // 2) Redireciona para o topo da página (limpa ?id=... se houver)
+  window.location.href = window.location.pathname;
+});
