@@ -322,15 +322,17 @@ function desenharLista() {
   };
 
   const base = filtrarPorPermissao(todosOsItens);
-  const ehFinalizado = (v) =>{
-    const s = String(v || '').toLowerCase();
+    const ehFinalizado = (v) => {
+    const s = String(v || '').trim().toLowerCase();
+    return s === 'finalizado' || s === 'concluído' || s === 'concluido';
   };
+
   let itensFiltrados = base;
   if (filtroAtual === 'pendente') {
-    itensFiltrados = base.filter(i => !ehFinalizado(pagaValor(i ['Situacao', 'situacao', 'Status', 'status'])));
-  } else if (filtroAtual === 'finalizado") {
-    itensFiltrados = base.filter(i => ehFinalizado(pagaValor(i ['Situacao', 'situacao', 'Status', 'status'])));
-}
+    itensFiltrados = base.filter(i => !ehFinalizado(pegarValor(i, ['Situacao', 'situacao', 'Status', 'status'])));
+  } else if (filtroAtual === 'finalizado') {
+    itensFiltrados = base.filter(i => ehFinalizado(pegarValor(i, ['Situacao', 'situacao', 'Status', 'status'])));
+  }
 
   if (itensFiltrados.length === 0) {
     lista.innerHTML = '<p class="vazio">Nenhuma ocorrência encontrada.</p>';
@@ -599,14 +601,14 @@ form.addEventListener('submit', async function (e) {
     }
 
     try {
-      form.elements['status'].value = 'concluído';
+            form.elements['status'].value = 'Concluído';   // normaliza o valor do <select>
       await chamarFluxo({ 
         ...lerCampos(), 
         acao: 'atualizar', 
         id: idEmEdicao, 
         idFormulario: idFormulario, 
-        situacao: 'Finalizado'
-        status: 'concluído'
+        situacao: 'Finalizado',
+        status: 'Concluído'                          // garante valor consistente
       }, URL_SALVAR);
       alert('Tratativa concluída com sucesso!');
       mostrarTelaLista();
