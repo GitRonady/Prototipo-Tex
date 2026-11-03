@@ -579,27 +579,6 @@ form.addEventListener('submit', async function (e) {
     botao.disabled = true;
     botao.innerHTML = 'Salvando...';
 
-    // VALIDAÇÃO DAS DATAS
-    const dPrevisaoInicio    = form.elements['dataPrevisaoInicio'].value;
-    const dInicioReal        = form.elements['dataInicioReal'].value;
-    const dPrevisaoConclusao = form.elements['dataPrevisaoConclusao'].value;
-    const dConclusaoReal     = form.elements['dataConclusaoReal'].value;
-
-    const compara = (a, b, msg) => {
-      if (a && b && a > b) { alert(msg); throw new Error(msg); }
-    };
-
-    try {
-      compara(dPrevisaoInicio,    dPrevisaoConclusao, 'A previsão de início não pode ser depois da previsão de conclusão.');
-      compara(dPrevisaoInicio,    dInicioReal,        'A previsão de início não pode ser depois do início real.');
-      compara(dInicioReal,        dConclusaoReal,     'O início real não pode ser depois da conclusão real.');
-      compara(dPrevisaoConclusao, dConclusaoReal,     'A previsão de conclusão não pode ser depois da conclusão real.');
-    } catch (e) {
-      botao.disabled = false;
-      botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Concluir Tratativa';
-      return;
-    }
-
     try {
             form.elements['status'].value = 'Concluído';   // normaliza o valor do <select>
       await chamarFluxo({ 
