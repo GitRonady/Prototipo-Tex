@@ -36,25 +36,30 @@ const formLogin = document.getElementById('formLogin');
 const loginEmail = document.getElementById('loginEmail');
 const loginErro = document.getElementById('loginErro');
 
+// Se já existe sessão ativa, libera o acesso direto (sem pedir login novamente)
 if (sessionStorage.getItem('usuarioAutenticado')) {
   liberarAcesso(sessionStorage.getItem('usuarioAutenticado'));
 }
 
+//valida domínio + chama API de validação
 formLogin.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = loginEmail.value.trim().toLowerCase();
-
+  
+//Verifica se pertence ao domínio permitido
   if (!email.endsWith(DOMINIO_PERMITIDO)) {
     mostrarErroLogin('Use seu e-mail corporativo ' + DOMINIO_PERMITIDO);
     return;
   }
-
+  
+ // Desabilita o botão e mostra spinner durante a verificação
   const botao = formLogin.querySelector('button');
   const textoOriginal = botao.innerHTML;
   botao.disabled = true;
   botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24" style="animation: girar 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Verificando...';
   loginErro.hidden = true;
-
+  
+  // Cria timeout de 15s para evitar travamento caso o servidor não responda
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -70,7 +75,8 @@ formLogin.addEventListener('submit', async (e) => {
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
 
     const dados = await resp.json();
-
+    
+// Se válido, salva na sessão e libera o acesso
     if (dados.valido) {
       sessionStorage.setItem('usuarioAutenticado', email); 
       liberarAcesso(email); 
@@ -84,12 +90,15 @@ formLogin.addEventListener('submit', async (e) => {
       mostrarErroLogin('E-mail não corporativo ou conta inativa.');
     }
   } finally {
+    
+    // Restaura o botão ao estado original
     clearTimeout(timeoutId);
     botao.disabled = false;
     botao.innerHTML = textoOriginal;
   }
 });
 
+// Libera o acesso à aplicação após login validado
 function liberarAcesso(nomeUsuario) {
   telaLogin.hidden = true;
   telaLogin.style.display = 'none';
@@ -97,18 +106,23 @@ function liberarAcesso(nomeUsuario) {
   emailLogado = nomeUsuario.toLowerCase();
   
   if (emailLogado === EMAIL_ADMIN) {
+    
+     // Caso ADMIN: vê tudo, começa na tela de criação
     isAdmin = true;
     regionalDoUsuario = "TODAS";
     mostrarTelaCriacao();
   } else if (MAPA_REGIONAIS[emailLogado]) {
+    
+     // Trava o select de regional para esta pessoa
     isAdmin = false;
     regionalDoUsuario = MAPA_REGIONAIS[emailLogado];
     
-    // Trava o select de regional para esta pessoa
+
     const selectRegional = form.elements['regional'];
     selectRegional.innerHTML = `<option>${regionalDoUsuario}</option>`;
     selectRegional.classList.add('bloqueado');
     
+    // Se veio com ?id= na URL, abre direto aquele formulário; senão vai pra lista
     const urlParams = new URLSearchParams(window.location.search);
     const idDaUrl = urlParams.get('id');
     
@@ -119,18 +133,23 @@ function liberarAcesso(nomeUsuario) {
       mostrarTelaLista();
     }
   } else {
+    
+     // E-mail existe no domínio, mas não tem permissão mapeada
     alert('Acesso negado. Seu e-mail não possui permissão de acesso.\nContate o administrador.');
     sessionStorage.removeItem('usuarioAutenticado');
     window.location.reload();
   }
 }
 
+// Exibe uma mensagem de erro na tela de login
 function mostrarErroLogin(msg) {
   loginErro.textContent = msg;
   loginErro.hidden = false;
 }
 
 // FUNÇÕES AUXILIARES 
+
+// Wrapper de fetch para chamar os fluxos do Power Automate
 async function chamarFluxo(payload, url) {
   const resposta = await fetch(url, {
     method: 'POST',
@@ -142,16 +161,19 @@ async function chamarFluxo(payload, url) {
   return texto ? JSON.parse(texto) : {};
 }
 
+// Lê todos os campos do formulário como objeto {name: value}
 function lerCampos() {
   return Object.fromEntries(new FormData(form).entries());
 }
 
+// Atualiza os contadores de caracteres das textareas
 function atualizarContadores() {
   form.querySelectorAll('textarea').forEach(t => {
     t.parentElement.querySelector('.contador').textContent = t.value.length + '/' + t.maxLength;
   });
 }
 
+// Cria um elemento DOM de forma enxuta
 function criar(tag, classe, texto) {
   const e = document.createElement(tag);
   if (classe) e.className = classe;
@@ -159,6 +181,7 @@ function criar(tag, classe, texto) {
   return e;
 }
 
+// Gera um ID numérico de 6 dígitos único para o formulário
 function gerarIdFormulario() {
   let id;
   do {
@@ -167,6 +190,7 @@ function gerarIdFormulario() {
   return id;
 }
 
+// Extrai o ID do formulário de um item 
 function lerIdFormulario(item) {
   for (const chave of Object.keys(item)) {
     if (chave.toLowerCase().replace(/[^a-z]/g, '') === 'idformulario' && item[chave]) {
@@ -176,10 +200,12 @@ function lerIdFormulario(item) {
   return '';
 }
 
+// Exibe o ID do formulário atual no cabeçalho
 function mostrarId() {
   document.getElementById('idForm').textContent = idFormulario;
 }
 
+// Formata data/hora completa no padrão brasileiro
 function formatarData(valor) {
   if (!valor) return '';
   const d = new Date(valor);
@@ -187,6 +213,7 @@ function formatarData(valor) {
   return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
 }
 
+// Formata apenas data
 function formatarDataSimples(valor) {
   if (!valor) return '';
   const d = new Date(valor);
@@ -195,10 +222,13 @@ function formatarDataSimples(valor) {
 }
 
 //FILTRO DE PERMISSÃO
+
+// Normaliza o nome da regional para comparação
 function normalizarRegional(v) {
   return String(v || '').trim().toUpperCase().replace(/\s+/g, '');
 }
 
+// Extrai o valor de "regional" de um item, aceitando variações do nome da chave
 function lerRegionalItem(item) {
   const chaves = Object.keys(item);
   const chave = chaves.find(c => c.toLowerCase() === 'regional') ||
@@ -208,6 +238,9 @@ function lerRegionalItem(item) {
   return (v && typeof v === 'object') ? (v.Value || '') : v;
 }
 
+// Filtra a lista de itens conforme a permissão do usuário
+// - Admin: vê tudo
+// - Regional: vê apenas os da sua regional (e itens sem regional definida)
 function filtrarPorPermissao(itens) {
   if (isAdmin) return itens;
   const minha = normalizarRegional(regionalDoUsuario);
@@ -220,6 +253,8 @@ function filtrarPorPermissao(itens) {
 }
 
 //  CONTROLE DE TELAS
+
+// Exibe a tela de criação de nova ocorrência (somente admin)
 function mostrarTelaCriacao() {
   if (!isAdmin) return;
   
@@ -230,16 +265,18 @@ function mostrarTelaCriacao() {
   mostrarId();
   atualizarContadores();
   
+  // Desbloqueia todos os campos
   form.querySelectorAll('.bloqueado').forEach(c => c.classList.remove('bloqueado'));
   form.querySelectorAll('input, select, textarea').forEach(c => { c.readOnly = false; c.disabled = false; });
 
   document.getElementById('tituloFormulario').textContent = 'Nova Ocorrência';
   document.getElementById('camposExtras').style.display = 'none';
   
+  // Esconde o painel da lista e ajusta o layout
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
   
-  // CONTROLE DE BOTÕES AQUI
+ // Ajusta botões visíveis
   document.getElementById('btnVerLista').style.display = 'inline-flex';
   document.getElementById('btnEnviarOcorrencia').style.display = 'inline-flex';
   document.getElementById('btnVoltarLista').style.display = 'none';
@@ -249,6 +286,7 @@ function mostrarTelaCriacao() {
   document.getElementById('avisoEdicao').hidden = true;
 }
 
+// Exibe a tela de listagem de ocorrências
 function mostrarTelaLista() {
   isTelaCriacao = false;
   document.getElementById('painelLista').style.display = 'block'; 
@@ -257,7 +295,7 @@ function mostrarTelaLista() {
   document.getElementById('tituloFormulario').textContent = 'Detalhes da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
   
-  // CONTROLE DE BOTÕES AQUI
+ // Ajusta botões visíveis
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
   document.getElementById('btnSalvarProgresso').style.display = 'none';
@@ -273,6 +311,8 @@ function mostrarTelaLista() {
 }
 
 //  LISTAGEM 
+
+// Configura os botões de filtro (Todos / Pendente / Finalizado)
 document.querySelectorAll('.filtros button').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
@@ -283,6 +323,7 @@ document.querySelectorAll('.filtros button').forEach(btn => {
   });
 });
 
+// Carrega os formulários
 async function carregarFormularios(idParaAbrir = null) {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '<p class="vazio">Carregando...</p>';
@@ -292,6 +333,8 @@ async function carregarFormularios(idParaAbrir = null) {
     const validos = dadosBrutos.filter(item => item && (JSON.stringify(item).includes('problema') || JSON.stringify(item).includes('Problema')));
 
     todosOsItens = filtrarPorPermissao(validos);
+    
+    // Mantém apenas itens que tenham campos de "problema"
     todosOsItens.sort((a, b) => Number(b.ID || b.id || 0) - Number(a.ID || a.id || 0));
 
     if (idParaAbrir) {
@@ -311,6 +354,7 @@ async function carregarFormularios(idParaAbrir = null) {
   }
 }
 
+// Renderiza a lista de ocorrências com filtro e paginação
 function desenharLista() {
   const lista = document.getElementById('listaFormularios');
   lista.innerHTML = '';
@@ -322,11 +366,14 @@ function desenharLista() {
   };
 
   const base = filtrarPorPermissao(todosOsItens);
+  
+   // Helper: verifica se o status é "finalizado/concluído"
     const ehFinalizado = (v) => {
     const s = String(v || '').trim().toLowerCase();
     return s === 'finalizado' || s === 'concluído' || s === 'concluido';
   };
-
+  
+  // Aplica o filtro atual
   let itensFiltrados = base;
   if (filtroAtual === 'pendente') {
     itensFiltrados = base.filter(i => !ehFinalizado(pegarValor(i, ['Situacao', 'situacao', 'Status', 'status'])));
@@ -338,11 +385,13 @@ function desenharLista() {
     lista.innerHTML = '<p class="vazio">Nenhuma ocorrência encontrada.</p>';
     return;
   }
-
+  
+  // Paginação
   const totalPaginas = Math.ceil(itensFiltrados.length / POR_PAGINA);
   if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
   const itensDaPagina = itensFiltrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
-
+  
+// Monta cada cartão
   itensDaPagina.forEach(item => {
     const idItem = pegarValor(item, ['ID', 'id', 'Id']) || 'N/A';
     const statusItem = pegarValor(item, ['Situacao', 'situacao', 'Status', 'status']) || 'Pendente';
@@ -353,13 +402,15 @@ function desenharLista() {
     const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
     const info = criar('div');
     const isFinalizado = String(statusItem).toLowerCase() === 'finalizado' || String(statusItem).toLowerCase() === 'concluído';
-
+    
+// Badge de status + descrição do problema + linha resumida
     info.append(
       criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Pendente'),
       criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
       criar('p', '', 'Reg: ' + regionalItem + ' • Área: ' + areaItem + ' • ID: ' + (lerIdFormulario(item) || idItem))
     );
-
+    
+  // Linha de data de abertura
     const data = formatarData(pegarValor(item, ['criadoEm', 'CriadoEm', 'Data', 'Created', 'Criado']));
     if (data) {
       const linhaData = criar('p', 'data');
@@ -386,7 +437,8 @@ function desenharLista() {
       linhaPlano.append(pedacos.join(' • '));
       info.append(linhaPlano);
     }
-
+    
+    // Botão de ação do cartão
     const botao = criar('button', 'b-azul', isFinalizado ? 'Visualizar' : 'Continuar');
     botao.type = 'button';
     botao.addEventListener('click', () => abrirFormulario(item));
@@ -394,7 +446,8 @@ function desenharLista() {
     cartao.append(info, botao);
     lista.appendChild(cartao);
   });
-
+  
+ // Paginação (só aparece se houver mais de uma página)
   if (totalPaginas > 1) {
     const nav = criar('div', 'paginacao');
     const ant = criar('button', '', '← Anterior'); ant.type = 'button'; ant.disabled = paginaAtual === 1; ant.addEventListener('click', () => { paginaAtual--; desenharLista(); });
@@ -406,7 +459,11 @@ function desenharLista() {
 }
 
 //ABRIR E PREENCHER FORMULÁRIO
+
+// Abre um item específico no formulário, aplica bloqueios e ajusta botões
 function abrirFormulario(item) {
+  
+  // Helper local: busca valor por nome de chave (mesmo padrão dos outros)
   const pegarValor = (nomes) => {
     for (let n of nomes) if (item[n] !== undefined && item[n] !== null && String(item[n]).trim() !== '') return item[n];
     for (let c of Object.keys(item)) if (nomes.some(n => c.toLowerCase().includes(n.toLowerCase()))) return item[c];
@@ -442,13 +499,13 @@ function abrirFormulario(item) {
     if (valor && form.elements[campo]) form.elements[campo].value = String(valor).slice(0, 10);
   });
 
-  // Muda a tela
+  // Muda layout para a tela de tratativa
   document.getElementById('tituloFormulario').textContent = 'Tratativa da Ocorrência';
   document.getElementById('camposExtras').style.display = 'block';
   document.getElementById('painelLista').style.display = 'none';
   document.querySelector('.layout').classList.add('sem-lista');
   
-  // CONTROLE DE BOTÕES NA TELA DE TRATATIVA
+   // Ajuste de botões na tela de tratativa
   document.getElementById('btnVerLista').style.display = 'none';
   document.getElementById('btnEnviarOcorrencia').style.display = 'none';
   
@@ -459,18 +516,23 @@ function abrirFormulario(item) {
   }
 
   // Regras de Bloqueio
+
+  
   const situacao = String(pegarValor(['Situacao', 'situacao', 'Status', 'status'])).toLowerCase();
   
+  // Limpa bloqueios anteriores
   form.querySelectorAll('.bloqueado').forEach(c => c.classList.remove('bloqueado'));
   form.querySelectorAll('input, select, textarea').forEach(c => { c.readOnly = false; c.disabled = false; });
   document.getElementById('avisoEdicao').hidden = true;
-
+  
+// Não-admin sempre tem a regional travada
   if (!isAdmin) {
     const selectRegional = form.elements['regional'];
     selectRegional.classList.add('bloqueado');
     selectRegional.disabled = true;
   }
-
+  
+// Pendente de preenchimento: bloqueia campos iniciais
   if (situacao === 'pendente de preenchimento' || situacao === 'pendente') {
     ['regional', 'area', 'problema'].forEach(id => {
       const campo = form.elements[id];
@@ -480,6 +542,8 @@ function abrirFormulario(item) {
     document.getElementById('textoAvisoEdicao').textContent = 'Os campos iniciais estão bloqueados. Preencha a tratativa.';
     document.getElementById('avisoEdicao').hidden = false;
     document.getElementById('btnConcluir').style.display = 'inline-flex';
+    
+    // Finalizado: bloqueia tudo, só status/comentário editáveis
   } else if (situacao === 'finalizado' || situacao === 'concluído') {
     ['regional', 'area', 'problema', 'causa', 'plano', 'responsavel',
      'dataPrevisaoInicio', 'dataInicioReal', 'dataPrevisaoConclusao', 'dataConclusaoReal'].forEach(id => {
@@ -491,17 +555,23 @@ function abrirFormulario(item) {
     document.getElementById('avisoEdicao').hidden = false;
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   } else {
+    
+    // Em andamento: nada bloqueado, pode concluir
     document.getElementById('btnConcluir').style.display = 'inline-flex';
   }
-
+  
+// Botão "Salvar progresso" só aparece para regional em item não finalizado
   const btnSalvar = document.getElementById('btnSalvarProgresso');
   const jaFinalizado = (situacao === 'finalizado' || situacao === 'concluído');
   btnSalvar.style.display = (!isAdmin && !jaFinalizado) ? 'inline-flex' : 'none';
-
+  
+// Rola o formulário para o topo da viewport
   document.getElementById('formPlano').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 //ENVIOS (CRIAR E CONCLUIR)
+
+// Botões de navegação da tela
 document.getElementById('btnVerLista').addEventListener('click', mostrarTelaLista);
 document.getElementById('btnVoltarLista').addEventListener('click', mostrarTelaCriacao);
 document.getElementById('btnAtualizar').addEventListener('click', () => carregarFormularios());
@@ -516,6 +586,8 @@ document.getElementById('btnSalvarProgresso').addEventListener('click', async fu
   botao.innerHTML = 'Salvando...';
 
   try {
+    
+    // Se ainda estava "Pendente de preenchimento", vira "Em Andamento"
     const campoStatus = form.elements['status'];
     if (campoStatus.value === 'Pendente de preenchimento') campoStatus.value = 'Em Andamento';
 
@@ -538,11 +610,14 @@ document.getElementById('btnSalvarProgresso').addEventListener('click', async fu
   botao.innerHTML = htmlOriginal;
 });
 
+// Submit principal do formulário: cria (tela de criação) OU conclui (tela de tratativa)
 form.addEventListener('submit', async function (e) {
   e.preventDefault();
   
   // Se for a tela de criação (Nova Ocorrência)
   if (isTelaCriacao) {
+    
+    // Validação mínima dos campos obrigatórios
     if (!form.elements['regional'].value || !form.elements['area'].value || !form.elements['problema'].value) {
       alert('Preencha a Regional, Área e o Problema identificado.');
       return;
@@ -573,6 +648,7 @@ form.addEventListener('submit', async function (e) {
     botao.disabled = false;
     botao.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Ocorrência';
   } 
+    
   // Se for a tela de Tratativa (Concluir)
   else {
     const botao = document.getElementById('btnConcluir');
@@ -600,17 +676,18 @@ form.addEventListener('submit', async function (e) {
   }
 });
 
-// Adiciona a animação do spinner no CSS
+// Injeta a animação de "girar" usada no spinner dos botões
 const style = document.createElement('style');
 style.innerHTML = `@keyframes girar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
 document.head.appendChild(style);
 
-// Inicia
+// Estado inicial: gera um ID de formulário e atualiza contadores
 idFormulario = gerarIdFormulario();
 mostrarId();
 atualizarContadores();
 
 // ==================== LOGOFF ====================
+
 const btnSair = document.getElementById('btnSair');
 const spanUsuario = document.getElementById('usuarioLogado');
 
@@ -626,10 +703,10 @@ function atualizarCabecalho() {
   }
 }
 
-// Executa ao carregar
+// Executa ao carregar a página
 atualizarCabecalho();
 
-// Clique no botão Sair
+// Clique no botão "Sair": confirma, limpa a sessão e recarrega a página
 btnSair.addEventListener('click', () => {
   if (!confirm('Deseja realmente sair do sistema?')) return;
 
