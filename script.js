@@ -412,7 +412,7 @@ function desenharLista() {
     // Se for um GUID válido (maior que 10 caracteres), mostra só o começo
     else if (idExibicao.length > 10) {
         idExibicao = idExibicao.substring(0, 8) + '...';
-      
+    }
 // Badge de status + descrição do problema + linha resumida
     info.append(
       criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Pendente'),
