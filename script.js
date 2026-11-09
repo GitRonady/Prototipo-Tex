@@ -402,7 +402,17 @@ function desenharLista() {
     const cartao = criar('div', 'item' + (String(idItem) === String(idEmEdicao) ? ' ativo' : ''));
     const info = criar('div');
     const isFinalizado = String(statusItem).toLowerCase() === 'finalizado' || String(statusItem).toLowerCase() === 'concluído';
+
+    let idExibicao = lerIdFormulario(item) || idItem;
     
+    // Se ainda vier "guid()" por algum motivo, esconde
+    if (idExibicao === 'guid()' || idExibicao === 'guid') {
+        idExibicao = 'N/D'; 
+    } 
+    // Se for um GUID válido (maior que 10 caracteres), mostra só o começo
+    else if (idExibicao.length > 10) {
+        idExibicao = idExibicao.substring(0, 8) + '...';
+      
 // Badge de status + descrição do problema + linha resumida
     info.append(
       criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Pendente'),
