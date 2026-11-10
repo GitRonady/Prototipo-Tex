@@ -23,7 +23,7 @@ let regionalDoUsuario = "";
 // MAPEAMENTO DE ACESSOS
 const MAPA_REGIONAIS = {
   'igor.pinheiro@totalexpress.com.br': 'NE',
-  'robson.santos@totalexpress.com.br': 'MG/RJ/ES',
+  'ronady.santos@totalexpress.com.br': 'MG/RJ/ES',
   'adriele.costa@totalexpress.com.br': 'SUL',
   'debora.medici@totalexpress.com.br': 'SP',
   'giovanna.gomes@totalexpress.com.br': 'CO/N'
