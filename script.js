@@ -163,7 +163,9 @@ async function chamarFluxo(payload, url) {
 
 // Lê todos os campos do formulário como objeto {name: value}
 function lerCampos() {
-  return Object.fromEntries(new FormData(form).entries());
+  const dados = {};
+  [...form.elements].forEach(el => { if (el.name) dados[el.name] = el.value; });
+  return dados;
 }
 
 // Atualiza os contadores de caracteres das textareas
@@ -216,9 +218,10 @@ function formatarData(valor) {
 // Formata apenas data
 function formatarDataSimples(valor) {
   if (!valor) return '';
+  const m = String(valor).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[3]}/${m[2]}/${m[1]}`;       // não passa por fuso horário
   const d = new Date(valor);
-  if (isNaN(d)) return '';
-  return d.toLocaleDateString('pt-BR');
+  return isNaN(d) ? '' : d.toLocaleDateString('pt-BR');
 }
 
 //FILTRO DE PERMISSÃO
@@ -472,6 +475,7 @@ function desenharLista() {
 
 // Abre um item específico no formulário, aplica bloqueios e ajusta botões
 function abrirFormulario(item) {
+   isTelaCriacao = false;
   
   // Helper local: busca valor por nome de chave (mesmo padrão dos outros)
   const pegarValor = (nomes) => {
