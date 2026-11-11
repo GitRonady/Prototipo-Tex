@@ -23,7 +23,7 @@ let regionalDoUsuario = "";
 // MAPEAMENTO DE ACESSOS
 const MAPA_REGIONAIS = {
   'igor.pinheiro@totalexpress.com.br': 'NE',
-  'ronady.santos@totalexpress.com.br': 'MG/RJ/ES',
+  'robson.santos@totalexpress.com.br': 'MG/RJ/ES',
   'adriele.costa@totalexpress.com.br': 'SUL',
   'debora.medici@totalexpress.com.br': 'SP',
   'giovanna.gomes@totalexpress.com.br': 'CO/N'
@@ -420,7 +420,7 @@ function desenharLista() {
     info.append(
       criar('span', 'badge ' + (isFinalizado ? 'finalizado' : 'pendente'), isFinalizado ? 'Concluído' : 'Pendente'),
       criar('strong', '', String(problemaItem).length > 45 ? String(problemaItem).slice(0, 45) + '...' : String(problemaItem)),
-      criar('p', '', 'Reg: ' + regionalItem + ' • Área: ' + areaItem + ' • ID: ' + (lerIdFormulario(item) || idItem))
+      criar('p', '', 'Reg: ' + regionalItem + ' • Área: ' + areaItem + ' • ID: ' + idExibicao)
     );
     
   // Linha de data de abertura
